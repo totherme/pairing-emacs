@@ -193,11 +193,11 @@ Features mostly provided by [go-mode](https://github.com/dominikh/go-mode.el), w
 - Emacs is old, and lots of things have borrowed shortcuts from it
   over the years. If you're a fast bash user, you can transfer some of
   those skills:
-  + C-b and C-f go backwards and forwards
-  + C-p and C-n go to previous and next lines
-  + C-a goes to the beginning of the line
-  + C-e goes to the end of the line
-  + C-r is "reverse search" -- searching backwards through things you
+  + `C-b` and `C-f` go backwards and forwards
+  + `C-p` and `C-n` go to previous and next lines
+  + `C-a` goes to the beginning of the line
+  + `C-e` goes to the end of the line
+  + `C-r` is "reverse search" -- searching backwards through things you
     typed above
 
 ### Using the help system
