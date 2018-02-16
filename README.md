@@ -211,12 +211,12 @@ sub-systems worth mentioning here:
   whole book about emacs.
 - "I just did something, and something happened, and I don't know what
   I did" -- we can figure it out with the help system
-	  + `C-h l` will list the last 300 keystrokes you entered. Now you
-		know what keys you pressed to do the thing you did
-	  + `C-h k <KEY>` will get help specifically on whatever happens
-		when you press `<KEY>`.
-	  + If one of the things you did was call a function with `M-x`,
-        you can get help on a function with `C-h f <function name>`
+  + `C-h l` will list the last 300 keystrokes you entered. Now you
+	know what keys you pressed to do the thing you did
+  + `C-h k <KEY>` will get help specifically on whatever happens when
+	you press `<KEY>`.
+  + If one of the things you did was call a function with `M-x`, you
+    can get help on a function with `C-h f <function name>`
 - If you want to know what keyboard shortcuts are available right now,
   hit `C-h b`
   
