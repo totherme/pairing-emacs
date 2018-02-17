@@ -6,9 +6,25 @@ something like [tmate](https://tmate.io/) along with any voice-chat
 solution and you're away. However, not all remote pairs are
 comfortable with vim.
 
-This is an emacs configuration which is designed to:
+This is an emacs and tmux configuration which is designed to:
 - be as accessible as possible to users of IDEs like intellij
 - work properly in a terminal, so we can pair over ssh.
+
+# Table of Contents
+
+1. [Installing](#installing)
+1. [Using](#using)
+   1. [Non-standard features enabled here by default](#non-standard-features-enabled-here-by-default)
+   1. [Tmux](#tmux)
+	  1. [Plugins enabled in this tmux config](#plugins-enabled-in-this-tmux-config)
+   1. [Golang editing](#golang-editing)
+   1. [Learning more about emacs](#learning-more-about-emacs)
+     1. [The absolute essentials](#the-absolute-essentials)
+	 1. [Emacs key notation](#emacs-key-notation)
+	 1. [Basic things that might not be where you expect](#basic-things-that-might-not-be-where-you-expect)
+	 1. [Some emacs UX philosophy](#some-emacs-UX-philosophy)
+	 1. [Using the help system](#using-the-help-system)
+
 
 # Installing
 
@@ -26,6 +42,10 @@ go get -u golang.org/x/tools/cmd/goimports
 go get -u github.com/rogpeppe/godef
 go get -u github.com/nsf/gocode
 go get -u github.com/dougm/goflymake
+
+# use our tmux config
+mv ~/.tmux.conf ~/.tmux.conf.backup
+ln -s ~/.emacs.d/tmux.conf ~/.tmux.conf
 ```
 
 You can now start emacs in its own window with `emacs` or in the
@@ -101,8 +121,53 @@ about emacs](#learning-more-about-emacs) below.
    cursor. Annoyingly, the `C->` and `C-<` shortcuts don't work at the
    terminal because the terminal doesn't distinguish between `C-.` and
    `C->`.
+
+## Tmux
+
+The tmux config included in this repository is intended to:
+
+1. Stay out of the way of the emacs shortcuts we'll need when remote pairing
+1. Be familiar to anyone who has experience using tmux
+1. Provide cool and useful features
+
+For example, while the default (and hence very common) tmux prefix-key
+is `C-b`, **our prefix key is `C-q`**. This is because `C-b` is a
+commonly used emacs shortcut for moving the cursor backwards, while
+`C-q` is an infrequently used emacs shortcut for inserting a literal
+character (often a tab or control character). If you want to use this
+functionality you should hit `C-q C-q`, which will cause tmux to pass
+a single `C-q` through to emacs.
+
+To learn more about tmux, try [this free-to-read-online
+book](https://leanpub.com/the-tao-of-tmux/read). If you're used to a
+heavily customised tmux config, you may be interested in [this list of
+default tmux
+keybindings](https://leanpub.com/the-tao-of-tmux/read#leanpub-auto-keybindings-1).
+
+### Non-standard keybindings
+
+- `<Prefix> \` is bound to `synchronize-panes`. This is useful when,
+  for example, simultaneously managing/debugging multiple remote
+  machines in a single cluster.
+
+### Plugins enabled in this tmux config
+
+To use any of these plugins, you must install them. You can do this by
+starting tmux, and hitting `C-q I`. You only need to do this once --
+they will be available in every tmux session on your machine
+thereafter.
+
+- [sensible](https://github.com/tmux-plugins/tmux-sensible)
+- [copycat](https://github.com/tmux-plugins/tmux-copycat)
+- [yank](https://github.com/tmux-plugins/tmux-yank)
+- [open](https://github.com/tmux-plugins/tmux-open)
+- [prefix-highlight](https://github.com/tmux-plugins/tmux-prefix-highlight)
+
 ## Golang editing
-Features mostly provided by [go-mode](https://github.com/dominikh/go-mode.el), which is [well documented here](http://dominik.honnef.co/posts/2013/03/writing_go_in_emacs/).
+Features mostly provided by
+[go-mode](https://github.com/dominikh/go-mode.el), which is [well
+documented
+here](http://dominik.honnef.co/posts/2013/03/writing_go_in_emacs/).
 - Every time you save, it will run goimports (which includes gofmt)
 - Inteligent autocompletion should work as you expect. This is
   provided by
