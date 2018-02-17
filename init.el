@@ -78,7 +78,7 @@ checking for a duet section in ~/.gitconfig"
 
 ;; Enable on-the-fly syntax and type checking for go files
 (package-install 'go-mode)
-(add-to-list 'load-path (concat (getenv "GOPATH") "/src/github.com/dougm/goflymake"))
+(add-to-list 'load-path "~/.emacs.d/goflymake")
 (require 'go-flymake)
 (add-hook 'go-mode-hook 'flymake-mode)
 (package-install 'go-eldoc)
