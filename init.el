@@ -112,6 +112,14 @@ checking for a duet section in ~/.gitconfig"
   (local-set-key (kbd "C-c C-e") 'flymake-popup-current-error-menu))
 (add-hook 'go-mode-hook 'my-go-keybindings)
 
+;; Make all this fancy golang stuff even when emacs has been started
+;; from the OSX finder
+(when (memq window-system '(mac ns))
+  (package-install 'exec-path-from-shell)
+  (exec-path-from-shell-initialize)
+  (exec-path-from-shell-copy-env "GOPATH")
+  (exec-path-from-shell-copy-env "PATH"))
+
 ;; Move the cursor basically anywhere by mashing the j key
 ;; (potentially along with some other key)
 (package-install 'key-chord)
