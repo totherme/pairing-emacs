@@ -100,6 +100,13 @@ about emacs](#learning-more-about-emacs) below.
 - You can start a shell in emacs. Hit `C-x M-m`
 - There's [a GUI for doing git operations](https://magit.vc/). Start
   it with `C-x g`
+  + This gui has been tweaked to try to detect whether you want to use
+    git-duet or not. It should work right out of the box, whether
+    you're using git-duet or not. You can force it either way by
+    [customizing](https://www.gnu.org/software/emacs/manual/html_node/emacs/Easy-Customization.html)
+    the `git-duet-enabled` variable. You can do this with `M-x
+    customize-variable` followed by `git-duet-enabled`. Whatever
+    change you make will be saved for future sessions.
 - [Ace-jump
   mode](https://github.com/winterTTr/ace-jump-mode/wiki). This is a
   way of quickly moving the cursor around a file.
