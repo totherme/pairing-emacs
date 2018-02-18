@@ -3,7 +3,7 @@
 set -eu
 set -o pipefail
 
-EMACS_DIR="${EMACS_DIR:-$HOME/.emacs.d/}"
+EMACS_DIR="${EMACS_DIR:-$HOME/.emacs.d}"
 PAIRING_EMACS_REPO="${PAIRING_EMACS_REPO:-https://github.com/totherme/pairing-emacs}"
 
 RED='\033[0;31m'
