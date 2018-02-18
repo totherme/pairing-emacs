@@ -1,0 +1,113 @@
+#!/usr/bin/env bash
+
+set -eu
+set -o pipefail
+
+EMACS_DIR="${EMACS_DIR:-$HOME/.emacs.d/}"
+PAIRING_EMACS_REPO="${PAIRING_EMACS_REPO:-https://github.com/totherme/pairing-emacs}"
+
+RED='\033[0;31m'
+GREEN='\033[1;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[1;34m'
+NC='\033[0m'    # No Colour
+
+
+main() {
+    info "Attempting to clone pairing-emacs..."
+    get_git_repo "$PAIRING_EMACS_REPO" "$EMACS_DIR"
+    info "Attempting to install golang tooling..."
+    optionally_get_go_tools
+    info "Attempting to install tmux config..."
+    install_tmux_config_from "${EMACS_DIR}/tmux.conf"
+
+    echo -e "${GREEN}DONE${NC}: See ${EMACS_DIR}/README.md for how to use this emacs setup."
+}
+
+get_git_repo() {
+    local git_repo target_dir
+    git_repo="${1:?Expected git_repo in get_git_repo}"
+    target_dir="${2:?Expected target_dir in get_git_repo}"
+
+    if ! which git 2>/dev/null >/dev/null ; then
+	fail "You don't seem to have git in your \$PATH. You'll need it to clone the pairing-emacs repo."
+    fi
+
+    if [[ -e "$target_dir" ]] ; then
+	warn "Found existing ${target_dir}. Backing it up."
+	backup_and_remove "$target_dir"
+    fi
+    git clone --recurse-submodules -q "$git_repo" "$target_dir"
+}
+
+backup_and_remove() {
+    local file backup i
+    file="${1:?Expected file name in backup_and_remove}"
+
+    shopt -s extglob		# Strip trailing '/' chars
+    file="${file%%+(/)}"
+
+    if [[ ! -e "$file" ]] ; then
+	return
+    fi
+
+    backup="${file}.backup"
+    i=1
+    while [[ -e "$backup" ]] ; do
+	backup="${file}.backup.${i}"
+	(( i++ ))
+    done
+
+    mv "$file" "$backup"
+}
+
+optionally_get_go_tools() {
+    if ! which go 2> /dev/null > /dev/null ; then
+	warn "You don't seem to have go. Skipping installing the go tools."
+	return 0
+    fi
+
+    if [[ -z "$GOPATH" ]] ; then
+	warn "You don't seem to have a \$GOPATH set up. Skipping installing the go tools."
+	return 0
+    fi
+
+    go get -u golang.org/x/tools/cmd/goimports \
+       github.com/rogpeppe/godef \
+       github.com/nsf/gocode \
+       github.com/dougm/goflymake
+}
+
+install_tmux_config_from() {
+    local source target
+    source="${1:?Expected source path in install_tmux_config_from}"
+    target="${HOME}/.tmux.conf"
+
+    if [[ -e "$target" ]] ; then
+	warn "Found an existing \$HOME/.tmux.conf. Backing it up."
+	backup_and_remove "$target"
+    fi
+
+    cp "$source" "$target"
+}
+
+fail() {
+    echo -e "${RED}FAIL${NC}:" "$@" >&2
+    exit 1
+}
+
+warn() {
+    echo -e "${YELLOW}WARNING${NC}:" "$@" >&2
+}
+
+info() {
+    echo -e "${BLUE}INFO${NC}:" "$@"
+}
+
+if [[ ! -z "${TESTS_ONLY:-}" ]] ; then
+    #  We're in a test harness. Don't do anything side-effecting. Just
+    #  load the functions for unit testing.
+    return 0
+fi
+
+main

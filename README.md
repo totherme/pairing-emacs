@@ -13,6 +13,9 @@ This is an emacs and tmux configuration which is designed to:
 # Table of Contents
 
 1. [Installing](#installing)
+   1. [Automatic](#automatic)
+   1. [Prerequisites](#prerequisites)
+   1. [By hand](#by-hand)
 1. [Using](#using)
    1. [Non-standard features enabled here by default](#non-standard-features-enabled-here-by-default)
    1. [Tmux](#tmux)
@@ -28,6 +31,26 @@ This is an emacs and tmux configuration which is designed to:
 
 # Installing
 
+## Automatic
+
+If you trust [my script](scripts/install), you can do:
+
+```sh
+curl https://raw.githubusercontent.com/totherme/pairing-emacs/master/scripts/install | bash
+```
+
+This essentially just does the manual steps [described below](#by-hand).
+
+## Prerequisites
+
+You'll need [git](https://git-scm.com/) and a recent version of
+[emacs](https://www.gnu.org/software/emacs/). To take advantage of the
+golang IDE-like features you'll need [go](https://golang.org/). It's
+recommended that you use this config with [tmate](https://tmate.io/)
+for remote pairing.
+
+## By hand
+
 ```sh
 # backup your existing emacs config
 mv ~/.emacs.d ~/.emacs.d.backup
@@ -38,10 +61,10 @@ git clone https://github.com/totherme/pairing-emacs ~/.emacs.d
 ...and optionally
 ```sh
 # get the golang tools that make this kind of thing possible
-go get -u golang.org/x/tools/cmd/goimports
-go get -u github.com/rogpeppe/godef
-go get -u github.com/nsf/gocode
-go get -u github.com/dougm/goflymake
+go get -u golang.org/x/tools/cmd/goimports \
+          github.com/rogpeppe/godef \
+          github.com/nsf/gocode \
+          github.com/dougm/goflymake
 
 # use our tmux config
 mv ~/.tmux.conf ~/.tmux.conf.backup

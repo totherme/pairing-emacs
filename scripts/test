@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+set -eu
+
+TEST_DIR_PATH="$(cd "$(dirname "$0")"/tests && pwd)"
+
+cd "$TEST_DIR_PATH"
+
+basht -- *_test.bash
