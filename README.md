@@ -41,6 +41,19 @@ curl https://raw.githubusercontent.com/totherme/pairing-emacs/master/scripts/ins
 
 This essentially just does the manual steps [described below](#by-hand).
 
+You can now start emacs in its own window with `emacs` or in the
+terminal with `emacs -nw`. If you're starting in the terminal for any
+reason other than a remote pairing session over ssh, you should
+probably look into [TRAMP](https://www.emacswiki.org/emacs/TrampMode)
+and the
+[emacs-client](https://www.emacswiki.org/emacs/EmacsClient). They
+might do what you want with less friction.
+
+The first time you start emacs after installing this config, emacs
+will download some plugins for doing golang editing and so on. This
+will slow down your initial startup, and will display a whole bunch of
+compilation output. Subsequent startups will be faster.
+
 ## Prerequisites
 
 You'll need [git](https://git-scm.com/) and a recent version of
@@ -70,19 +83,6 @@ go get -u golang.org/x/tools/cmd/goimports \
 mv ~/.tmux.conf ~/.tmux.conf.backup
 ln -s ~/.emacs.d/tmux.conf ~/.tmux.conf
 ```
-
-You can now start emacs in its own window with `emacs` or in the
-terminal with `emacs -nw`. If you're starting in the terminal for any
-reason other than a remote pairing session over ssh, you should
-probably look into [TRAMP](https://www.emacswiki.org/emacs/TrampMode)
-and the
-[emacs-client](https://www.emacswiki.org/emacs/EmacsClient). They
-might do what you want with less friction.
-
-The first time you start emacs after installing this config, emacs
-will download some plugins for doing golang editing and so on. This
-will slow down your initial startup, but subsequent startups will be
-faster.
 
 # Using
 
