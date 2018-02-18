@@ -22,11 +22,11 @@ This is an emacs and tmux configuration which is designed to:
 	  1. [Plugins enabled in this tmux config](#plugins-enabled-in-this-tmux-config)
    1. [Golang editing](#golang-editing)
    1. [Learning more about emacs](#learning-more-about-emacs)
-     1. [The absolute essentials](#the-absolute-essentials)
-	 1. [Emacs key notation](#emacs-key-notation)
-	 1. [Basic things that might not be where you expect](#basic-things-that-might-not-be-where-you-expect)
-	 1. [Some emacs UX philosophy](#some-emacs-UX-philosophy)
-	 1. [Using the help system](#using-the-help-system)
+	  1. [The absolute essentials](#the-absolute-essentials)
+	  1. [Emacs key notation](#emacs-key-notation)
+	  1. [Basic things that might not be where you expect](#basic-things-that-might-not-be-where-you-expect)
+	  1. [Some emacs UX philosophy](#some-emacs-UX-philosophy)
+	  1. [Using the help system](#using-the-help-system)
 
 
 # Installing
