@@ -130,9 +130,8 @@ about emacs](#learning-more-about-emacs) below.
     the `git-duet-enabled` variable. You can do this with `M-x
     customize-variable` followed by `git-duet-enabled`. Whatever
     change you make will be saved for future sessions.
-- [Ace-jump
-  mode](https://github.com/winterTTr/ace-jump-mode/wiki). This is a
-  way of quickly moving the cursor around a file.
+- [Avy mode](https://github.com/abo-abo/avy). This is a way of quickly
+  moving the cursor around a file.
   + If you quickly double-tap the `j` key, emacs will ask you for the
     first letter of a word. Once you've entered that letter, emacs
     will highlight all words beginning with that letter and ask which

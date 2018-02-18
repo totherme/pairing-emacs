@@ -124,12 +124,13 @@ checking for a duet section in ~/.gitconfig"
 ;; Move the cursor basically anywhere by mashing the j key
 ;; (potentially along with some other key)
 (package-install 'key-chord)
-(package-install 'ace-jump-mode)
+(package-install 'avy)
 (package-install 'ace-window)
 (key-chord-mode t)
-(key-chord-define-global "jj" 'ace-jump-word-mode)
-(key-chord-define-global "jl" 'ace-jump-line-mode)
+(key-chord-define-global "jj" 'avy-goto-word-1)
+(key-chord-define-global "jl" 'avy-goto-line)
 (key-chord-define-global "jw" 'ace-window)
+(avy-setup-default)
 
 ;; Enable fancy multiple-cursor editing
 (package-install 'multiple-cursors)
