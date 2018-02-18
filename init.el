@@ -10,6 +10,7 @@
 (add-to-list 'package-archives
 	     '("melpa-stable" . "http://stable.melpa.org/packages/") t)
 (package-initialize)
+(package-refresh-contents)
 
 ;; Start git or a shell with a single keypress
 (package-install 'magit)
