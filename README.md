@@ -3,11 +3,14 @@
 Sometimes it's important to be able to pair-program remotely. If both
 participants are comfortable with vim and tmux, then you can use
 something like [tmate](https://tmate.io/) along with any voice-chat
-solution and you're away. However, not all remote pairs are
-comfortable with vim.
+solution and you're away (I like Luan's
+[vim](https://github.com/luan/vimfiles) and
+[tmux](https://github.com/luan/tmuxfiles) configs for this). However,
+not all remote pairs are comfortable with vim.
 
 This is an emacs and tmux configuration which is designed to:
-- be as accessible as possible to users of IDEs like intellij
+- be as accessible as possible to users of IDEs like
+  [goland](https://www.jetbrains.com/go/)
 - work properly in a terminal, so we can pair over ssh.
 
 # Table of Contents
