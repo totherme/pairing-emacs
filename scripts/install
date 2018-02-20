@@ -88,7 +88,7 @@ install_tmux_config_from() {
 	backup_and_remove "$target"
     fi
 
-    cp "$source" "$target"
+    ln -s "$source" "$target"
 }
 
 fail() {
