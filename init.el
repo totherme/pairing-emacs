@@ -2,6 +2,9 @@
 ;; .gitignore
 (setq custom-file "~/.emacs.d/emacs-custom.el")
 
+;; Enable more org-mode export back-ends
+(setq org-export-backends (list 'ascii 'html 'icalendar 'latex 'md 'beamer 'odt))
+
 ;; Make windows-like shortcuts do what most folks expect
 (cua-mode 1)
 
