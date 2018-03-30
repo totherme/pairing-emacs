@@ -219,8 +219,9 @@ here](http://dominik.honnef.co/posts/2013/03/writing_go_in_emacs/).
 - To read what error caused a given highlight, put your cursor over
   the offending code, and hit `C-c C-e`. To dismiss the error, hit
   `C-g`.
-- To navigate to where something was declared or defined, but the
-  cursor over it, and and hit `M-.`
+- Introspection: to navigate to where something was declared or
+  defined, either control-click it, or put the cursor over it, and and
+  hit `M-.`
 - There are a bunch of
   [snippets](https://www.emacswiki.org/emacs/Yasnippet) available [for
   golang](https://github.com/dominikh/yasnippet-go/tree/master/go-mode)

@@ -105,6 +105,15 @@ checking for a duet section in ~/.gitconfig"
 ;; ...and gofmt when we save
 (add-hook 'before-save-hook 'gofmt-before-save)
 
+(defun my-golang-introspect (event)
+  "Move the point to the mouse, and try to do godef-jump."
+  (interactive "e")
+  (mouse-set-point event)
+  (godef-jump (point)))
+
+(defun my-do-nothing ()
+    (interactive))
+
 ;; Set some keybindings for use in golang files
 (defun my-go-keybindings ()
   ;; Use M-. (which means Alt-. on practically all keyboards these
@@ -113,7 +122,9 @@ checking for a duet section in ~/.gitconfig"
   ;; Use C-c m to trigger a go format
   (local-set-key (kbd "C-c m") 'gofmt)
   ;; Use C-c C-e to ask what compile error is under point
-  (local-set-key (kbd "C-c C-e") 'flymake-popup-current-error-menu))
+  (local-set-key (kbd "C-c C-e") 'flymake-popup-current-error-menu)
+  (local-set-key (kbd "C-<mouse-1>") 'my-golang-introspect)
+  (local-set-key (kbd "C-<down-mouse-1>") 'my-do-nothing))
 (add-hook 'go-mode-hook 'my-go-keybindings)
 
 ;; Make all this fancy golang stuff even when emacs has been started
