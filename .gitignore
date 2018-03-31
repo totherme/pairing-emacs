@@ -4,5 +4,5 @@ elpa
 auto-save-list
 /ido.last
 /emacs-custom.el~
-/basics.el
-/magit.el
+/configs/basics.el
+/configs/magit.el

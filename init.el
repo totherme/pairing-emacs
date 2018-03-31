@@ -2,9 +2,9 @@
 ;; .gitignore
 (setq custom-file "~/.emacs.d/emacs-custom.el")
 
-(org-babel-load-file "~/.emacs.d/basics.org")
+(org-babel-load-file "~/.emacs.d/configs/basics.org")
 
-(org-babel-load-file "~/.emacs.d/magit.org")
+(org-babel-load-file "~/.emacs.d/configs/magit.org")
 
 ;; If shellcheck is in the $PATH, we should use it when we're editing
 ;; shell scripts
