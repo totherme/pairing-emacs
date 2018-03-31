@@ -1,0 +1,62 @@
+* Magit
+
+  We use [[https://magit.vc/][magit]] for managing our git repos.
+
+  #+BEGIN_SRC emacs-lisp
+    (use-package magit
+      :ensure t
+      :pin melpa-stable
+      :commands (magit-status)
+      :bind (("C-x g" . magit-status)))
+  #+END_SRC
+** Making magit work with [[https://github.com/git-duet/git-duet][git-duet]]
+   If you like, you can explicitly configure magit to work with either
+   ~git commit~ or ~git duet commit~, using customize or ~(setq
+   git-duet-enabled "enabled")~.
+
+   #+BEGIN_SRC emacs-lisp
+     (defcustom git-duet-enabled "best-guess"
+       "Whether or not to use git duet-commit instead of git commit."
+       :group 'git-duet
+       :type '(choice (const "best-guess") (const "enabled") (const "disabled")))
+   #+END_SRC
+
+   If you don't tell us which commit method to use, we'll guess based
+   on the contents of =~/.gitconfig=.
+
+   #+BEGIN_SRC emacs-lisp
+     (defun git-duet-should-we-use-it? ()
+       "Decide whether or not to use git-duet.
+
+     First check the customizable variable git-duet-enabled. If set to
+     \"enabled\" then yes. If set to \"disabled\" then no. If set to
+     \"best-guess\", try to guess the best option using
+     git-duet-available"
+       (or   (equal git-duet-enabled "enabled")
+	     (and     (equal git-duet-enabled "best-guess")
+		      (git-duet-available))))
+
+     (defun git-duet-available ()
+       "Guess whether git-duet is available on this machine by
+     checking for a duet section in ~/.gitconfig"
+       (with-temp-buffer
+	 (insert-file "~/.gitconfig")
+	 (search-forward "[duet \"env\"]" (point-max) t)))
+   #+END_SRC
+
+   To tie this all together, we use advice around
+   ~magit-run-git-with-editor~.
+   #+BEGIN_SRC emacs-lisp
+     (advice-add 'magit-run-git-with-editor :around
+		 'magit-run-git-with-editor--git-duet)
+
+     (defun magit-run-git-with-editor--git-duet (fn &rest args)
+       "Wrap magit-run-git-with-editor to use 'duet-commit' instead of 'commit'.
+
+     You should pass magit-run-git-with-editor as FN, and any
+     remaining args as ARGS."
+       (if (and (git-duet-should-we-use-it?)
+		(equal (car args) "commit"))
+	   (apply fn "duet-commit" (cdr args))
+	 (apply fn args)))
+   #+END_SRC

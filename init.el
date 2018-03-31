@@ -4,49 +4,7 @@
 
 (org-babel-load-file "~/.emacs.d/basics.org")
 
-;; Use magit for git operations
-(use-package magit
-  :ensure t
-  :pin melpa-stable
-  :commands (magit-status)
-  :bind (("C-x g" . magit-status))
-  :config
-  ;; Make magit work properly with git-duet
-  (defcustom git-duet-enabled "best-guess"
-    "Whether or not to use git duet-commit instead of git commit."
-    :group 'git-duet
-    :type '(choice (const "best-guess") (const "enabled") (const "disabled")))
-
-  (advice-add 'magit-run-git-with-editor :around
-              'magit-run-git-with-editor--git-duet)
-
-  (defun magit-run-git-with-editor--git-duet (fn &rest args)
-    "Wrap magit-run-git-with-editor to use 'duet-commit' instead of 'commit'.
-
-You should pass magit-run-git-with-editor as FN, and any
-remaining args as ARGS."
-    (if (and (git-duet-should-we-use-it?)
-	     (equal (car args) "commit"))
-	(apply fn "duet-commit" (cdr args))
-      (apply fn args)))
-
-  (defun git-duet-should-we-use-it? ()
-    "Decide whether or not to use git-duet.
-
-First check the customizable variable git-duet-enabled. If set to
-\"enabled\" then yes. If set to \"disabled\" then no. If set to
-\"best-guess\", try to guess the best option using
-git-duet-available"
-    (or   (equal git-duet-enabled "enabled")
-	  (and     (equal git-duet-enabled "best-guess")
-		   (git-duet-available))))
-
-  (defun git-duet-available ()
-    "Guess whether git-duet is available on this machine by
-checking for a duet section in ~/.gitconfig"
-    (with-temp-buffer
-      (insert-file "~/.gitconfig")
-      (search-forward "[duet \"env\"]" (point-max) t))))
+(org-babel-load-file "~/.emacs.d/magit.org")
 
 ;; If shellcheck is in the $PATH, we should use it when we're editing
 ;; shell scripts
