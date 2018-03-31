@@ -1,0 +1,107 @@
+* Package Management
+
+  We should get packages from the melpa-stable, melpa, and gnu repos.
+  #+BEGIN_SRC emacs-lisp
+    (require 'package)
+    (add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/"))
+    (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+    (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/"))
+
+    (package-initialize)
+  #+END_SRC
+
+  Now that we know where to get packages from, we can get and use
+  [[https://github.com/jwiegley/use-package][use-package]] to manage the getting and using of all the other
+  packages.
+  #+BEGIN_SRC emacs-lisp
+    (unless (package-installed-p 'use-package)
+      (package-refresh-contents)
+      (package-install 'use-package))
+
+    (eval-when-compile
+      (require 'use-package))
+  #+END_SRC
+  
+* UI Tweaks And Keybindings
+
+** Behave more like an IDE, even in the terminal
+   Make windows-like shortcuts do what most folks expect. If you want
+   to turn this off, do ~M-x cua-mode~.
+   #+BEGIN_SRC emacs-lisp
+     (cua-mode 1)
+   #+END_SRC
+
+   If we're in a terminal, we should allow terminal-mouse stuff.
+   #+BEGIN_SRC emacs-lisp
+     (unless window-system
+       (xterm-mouse-mode))
+   #+END_SRC
+
+** Visual Stuff
+   Display line numbers -- this is especially useful when
+   pair-programming.
+   #+BEGIN_SRC emacs-lisp
+     (unless window-system
+       (setq linum-format "%3d \u2502 "))
+     (global-linum-mode)
+   #+END_SRC
+
+   We can use [[https://github.com/myrjola/diminish.el][diminish]] to clean up the mode-line, by reducing the
+   amount of space taken up by the names of all the minor-modes we
+   might be running.
+   #+BEGIN_SRC emacs-lisp
+     (use-package diminish
+     :ensure t)
+   #+END_SRC
+
+   Make autocompletion friendlier.
+   #+BEGIN_SRC emacs-lisp
+     (ido-mode)
+     (setq ido-auto-merge-work-directories-length -1)
+   #+END_SRC
+
+** Handy Tools
+   Start a shell with a single keypress.
+   #+BEGIN_SRC emacs-lisp
+     (global-set-key (kbd "C-x M-m") 'shell)  
+   #+END_SRC
+
+   Make dired (directory editing) behaviour more sensible:
+   - If we open two directory windows next to each other and ask to
+     move a file from one of them, the other will be the default
+     target.
+   - Hit ~r~ on a directory window in order to edit filenames and
+     permissions like regular text.
+   #+BEGIN_SRC emacs-lisp
+     (require 'wdired)
+     (setq
+      dired-dwim-target t
+      wdired-allow-to-change-permissions t)
+     (define-key dired-mode-map "r" 'wdired-change-to-wdired-mode)
+   #+END_SRC
+
+  
+** Make Backups More Sensible
+
+   - Don't clobber symlinks with backup files
+   - Put all backups in =~/.saves= instead of right next to the files I'm editing
+   - Version the backups
+   #+BEGIN_SRC emacs-lisp
+     (setq
+	backup-by-copying t
+	backup-directory-alist
+	 '(("." . "~/.saves"))
+	delete-old-versions t
+	kept-new-versions 6
+	kept-old-versions 2
+	version-control t)
+   #+END_SRC
+
+* Org-mode config
+  
+  By default, org-mode will only export to ascii, html, icalendar, and
+  latex. We can enable markdown, beamer and odt support.
+
+  #+BEGIN_SRC emacs-lisp
+    (setq org-export-backends (list 'ascii 'html 'icalendar 'latex 'md 'beamer 'odt))
+  #+END_SRC

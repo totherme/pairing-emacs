@@ -2,63 +2,7 @@
 ;; .gitignore
 (setq custom-file "~/.emacs.d/emacs-custom.el")
 
-;; Get packages from melpa-stable
-(require 'package)
-(add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/"))
-(add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
-(add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/"))
-
-(package-initialize)
-
-;; Use 'use-package' to manage the getting and loading of emacs
-;; packages
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
-
-(eval-when-compile
-  (require 'use-package))
-
-;; Enable more org-mode export back-ends
-(setq org-export-backends (list 'ascii 'html 'icalendar 'latex 'md 'beamer 'odt))
-
-;; Make windows-like shortcuts do what most folks expect
-(cua-mode 1)
-
-;; Start a shell with a single keypress
-(global-set-key (kbd "C-x M-m") 'shell)
-
-;; Display line numbers
-(unless window-system
-  (setq linum-format "%3d \u2502 "))
-(global-linum-mode)
-
-;; Make backup file behaviour more sensible
-(setq
-   backup-by-copying t      ; don't clobber symlinks
-   backup-directory-alist
-    '(("." . "~/.saves"))    ; don't litter my fs tree
-   delete-old-versions t
-   kept-new-versions 6
-   kept-old-versions 2
-   version-control t)       ; use versioned backups
-
-;; Make dired (directory editing) behaviour more sensible
-(require 'wdired)
-(setq
- dired-dwim-target t
- wdired-allow-to-change-permissions t)
-
-;; Make autocompletion friendlier.
-(ido-mode)
-(setq ido-auto-merge-work-directories-length -1)
-
-;; If we're in a terminal, we should allow terminal-mouse stuff
-(unless window-system
-  (xterm-mouse-mode))
-
-(use-package diminish
-  :ensure t)
+(org-babel-load-file "~/.emacs.d/basics.org")
 
 ;; Use magit for git operations
 (use-package magit
