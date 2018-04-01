@@ -60,6 +60,99 @@
      (setq ido-auto-merge-work-directories-length -1)
    #+END_SRC
 
+** Navigation
+   I like to be able to navigate quickly to wherever on the screen I
+   happen to be looking. I do this with [[https://github.com/abo-abo/avy][avy]]. Since navigation is
+   pretty much the most common thing I do in an editor, I want
+   shortcuts that are extremely short, and that don't clash with any
+   of the other millions of shortcuts in the emacs ecosystem. To get
+   this, I use [[https://www.emacswiki.org/emacs/KeyChord][key-chords]]:
+   - If you mash ~jl~, every line on screen will get a two-character
+     label. Type the label to jump to that line.
+   - If you mash ~jw~, every window on screen will get a one-character
+     label. Type the label to jump to that line[fn:1].
+   - If you mash ~jj~, you get prompted for a character. Type the
+     first character of the word you want to jump to. Now all words
+     that begin with that character will be labelled. Type the label
+     to jump to that word.
+     #+BEGIN_SRC emacs-lisp
+       (use-package key-chord
+	 :ensure t
+	 :config
+	 (use-package avy
+	   :ensure t)
+	 (use-package ace-window
+	   :ensure t)
+	 (key-chord-mode t)
+	 (key-chord-define-global "jj" 'avy-goto-word-1)
+	 (key-chord-define-global "jl" 'avy-goto-line)
+	 (key-chord-define-global "jw" 'ace-window)
+	 (avy-setup-default))
+     #+END_SRC
+
+** Multiple-cursor editing
+   Allow editing with [[https://github.com/magnars/multiple-cursors.el][multple cursors]]. There's a good [[http://emacsrocks.com/e13.html][introduction video here]].
+   #+BEGIN_SRC emacs-lisp
+       (use-package multiple-cursors
+	 :ensure t
+	 :config
+	 (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
+	 (global-set-key (kbd "C->") 'mc/mark-next-like-this)
+	 (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+	 (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this))
+   #+END_SRC
+
+** Sort out emacs' crazy undo/redo system
+   Quoting from the [[http://www.dr-qubit.org/undo-tree.html][undo-tree web page]]:
+   #+BEGIN_QUOTE
+   Emacs has a powerful undo system. Unlike the standard undo/redo
+   system in most software, it allows you to recover any past state of
+   a buffer (whereas the standard undo/redo system can lose past
+   states as soon as you redo). However, this power comes at a price:
+   many people find Emacs' undo system confusing and difficult to use
+   #+END_QUOTE
+
+   I agree. To get an idea of how non-intuitive the vanilla-emacs undo system
+   is, note that there is a keybinding for ~undo~, but no keybinding
+   for ~redo~.
+
+   The undo-tree package solves the problem by:
+   - Having a redo function
+   - Still allowing us to recover all past states of the buffer, by
+     visualising those states as a tree.
+
+   To undo a change, hit ~C-z~[fn:2], ~C-/~ or ~C-_~ as normal. To
+   redo a change, hit ~C-?~ or ~M-_~. If you undo a few changes,
+   accidentally type something (so "redo" will no longer do anything),
+   and suddenly realise that you shouldn't have hit "undo" in the
+   first place, then hit ~C-x u~. This will show you a tree
+   representation of the changes you just made, undid, and the new
+   timeline you created when you accidentally typed whatever it was
+   you typed. You can move around in this branching timeline by
+   clicking, or using standard emacs navigation keys.
+
+   #+BEGIN_SRC emacs-lisp
+     (use-package undo-tree
+       :ensure t)
+     (global-undo-tree-mode)
+       ;; https://www.emacswiki.org/emacs/UndoTree
+   #+END_SRC
+
+   Out of the box, undo-tree doesn't play nicely with the line numbers
+   we might be relying on for pair-programming. To fix this (as [[https://www.emacswiki.org/emacs/UndoTree][suggested here]]), we can
+   add a bunch of advice around the undo-tree functions which force
+   the line numbers to update themselves.
+   #+BEGIN_SRC emacs-lisp
+     (defun undo-tree-visualizer-update-linum (&rest args)
+       (linum-update undo-tree-visualizer-parent-buffer))
+     (advice-add 'undo-tree-visualize-undo :after #'undo-tree-visualizer-update-linum)
+     (advice-add 'undo-tree-visualize-redo :after #'undo-tree-visualizer-update-linum)
+     (advice-add 'undo-tree-visualize-undo-to-x :after #'undo-tree-visualizer-update-linum)
+     (advice-add 'undo-tree-visualize-redo-to-x :after #'undo-tree-visualizer-update-linum)
+     (advice-add 'undo-tree-visualizer-mouse-set :after #'undo-tree-visualizer-update-linum)
+     (advice-add 'undo-tree-visualizer-set :after #'undo-tree-visualizer-update-linum)
+   #+END_SRC
+
 ** Handy Tools
    Start a shell with a single keypress.
    #+BEGIN_SRC emacs-lisp
@@ -79,8 +172,6 @@
       wdired-allow-to-change-permissions t)
      (define-key dired-mode-map "r" 'wdired-change-to-wdired-mode)
    #+END_SRC
-
-  
 ** Make Backups More Sensible
 
    - Don't clobber symlinks with backup files
@@ -105,3 +196,12 @@
   #+BEGIN_SRC emacs-lisp
     (setq org-export-backends (list 'ascii 'html 'icalendar 'latex 'md 'beamer 'odt))
   #+END_SRC
+
+* Footnotes
+
+[fn:2] Unless you've disabled cua-mode. In which case only the
+emacs-like shortcuts are available to you.
+
+[fn:1] If there are only two windows open, avy will skip the
+label-and-choose step, and just jump you straight into the other
+window.
