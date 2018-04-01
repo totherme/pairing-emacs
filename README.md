@@ -232,6 +232,12 @@ here](http://dominik.honnef.co/posts/2013/03/writing_go_in_emacs/).
 - Introspection: to navigate to where something was declared or
   defined, either control-click it, or put the cursor over it, and and
   hit `M-.`
+- To run tests:
+  + in the current file, hit `C-x f`
+  + in the current project, hit `C-x p`
+  + for a coverage report, hit `C-x c`
+  + for the current test, hit `C-x t`
+  + to `go run` something, hit `C-x x`
 - There are a bunch of
   [snippets](https://www.emacswiki.org/emacs/Yasnippet) available [for
   golang](https://github.com/dominikh/yasnippet-go/tree/master/go-mode)

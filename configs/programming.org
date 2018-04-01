@@ -198,6 +198,23 @@
       (add-hook 'go-mode-hook 'my-company-go-backend)
     #+END_SRC
 
+*** Testing
+    We can use [[https://github.com/nlamirault/gotest.el][gotest]] to run tests in a fine-grained way.
+    #+BEGIN_SRC emacs-lisp
+      (use-package gotest
+	:ensure t)
+    #+END_SRC
+
+    The gotest home page suggests the following keybindings. I'm
+    ignoring the suggested benchmark keybinding (~C-x b~) because it
+    clashes with ~switch-to-buffer~.
+    #+BEGIN_SRC emacs-lisp
+      (define-key go-mode-map (kbd "C-x f") 'go-test-current-file)
+      (define-key go-mode-map (kbd "C-x t") 'go-test-current-test)
+      (define-key go-mode-map (kbd "C-x p") 'go-test-current-project)
+      (define-key go-mode-map (kbd "C-x x") 'go-run)
+      (define-key go-mode-map (kbd "C-x c") 'go-test-current-coverage)
+    #+END_SRC
 ** Markdown
 
    Use [[https://jblevins.org/projects/markdown-mode/][markdown mode]] for editing markdown. 
