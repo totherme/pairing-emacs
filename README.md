@@ -117,8 +117,7 @@ directory. Some highlights are listed below.
   terminal, because on terminals `C-?` is equivalent to `DEL`.
 - You can [naviate your entire undo
   history](http://www.dr-qubit.org/undo-tree.html), including branches
-  that you previously edited over the top of, using `M-x
-  undo-tree-visualize`.
+  that you previously edited over the top of, using `C-x u`.
 - The mouse should work. Even at the terminal. Try clicking to move
   the cursor, or highlighting text, or activating a menu at the top of
   the screen.
