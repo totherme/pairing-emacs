@@ -1,3 +1,6 @@
+#+STARTUP: fnadjust
+#+OPTIONS: f:t
+
 * Package Management
 
   We should get packages from the melpa-stable, melpa, and gnu repos.
@@ -121,7 +124,7 @@
    - Still allowing us to recover all past states of the buffer, by
      visualising those states as a tree.
 
-   To undo a change, hit ~C-z~[fn:2], ~C-/~ or ~C-_~ as normal. To
+   To undo a change, hit ~C-z~ [fn:2], ~C-/~ or ~C-_~ as normal. To
    redo a change, hit ~C-?~ or ~M-_~. If you undo a few changes,
    accidentally type something (so "redo" will no longer do anything),
    and suddenly realise that you shouldn't have hit "undo" in the
@@ -199,9 +202,9 @@
 
 * Footnotes
 
-[fn:2] Unless you've disabled cua-mode. In which case only the
-emacs-like shortcuts are available to you.
-
 [fn:1] If there are only two windows open, avy will skip the
 label-and-choose step, and just jump you straight into the other
 window.
+
+[fn:2] Unless you've disabled cua-mode. In which case only the
+emacs-like shortcuts are available to you.
