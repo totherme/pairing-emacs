@@ -71,8 +71,8 @@
     long as the toolbar is left on, we'll get back and forward buttons
     in the toolbar. If you want to navigate backwards and forwards
     with the keyboard, use the following:
-    - For backwards ~C-x <left>~ or ~C-x C-<left>~.
-    - For forwards ~C-x <right>~ or ~C-x C-<right>~.
+    - For backwards ~C-x C-<left>~.
+    - For forwards ~C-x C-<right>~.
     #+BEGIN_SRC emacs-lisp
       (use-package back-button
 	:ensure t
