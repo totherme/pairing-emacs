@@ -7,3 +7,4 @@ auto-save-list
 /configs/basics.el
 /configs/magit.el
 /configs/programming.el
+var

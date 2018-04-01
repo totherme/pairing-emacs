@@ -64,34 +64,51 @@
    #+END_SRC
 
 ** Navigation
-   I like to be able to navigate quickly to wherever on the screen I
-   happen to be looking. I do this with [[https://github.com/abo-abo/avy][avy]]. Since navigation is
-   pretty much the most common thing I do in an editor, I want
-   shortcuts that are extremely short, and that don't clash with any
-   of the other millions of shortcuts in the emacs ecosystem. To get
-   this, I use [[https://www.emacswiki.org/emacs/KeyChord][key-chords]]:
-   - If you mash ~jl~, every line on screen will get a two-character
-     label. Type the label to jump to that line.
-   - If you mash ~jw~, every window on screen will get a one-character
-     label. Type the label to jump to that line[fn:1].
-   - If you mash ~jj~, you get prompted for a character. Type the
-     first character of the word you want to jump to. Now all words
-     that begin with that character will be labelled. Type the label
-     to jump to that word.
-     #+BEGIN_SRC emacs-lisp
-       (use-package key-chord
-	 :ensure t
-	 :config
-	 (use-package avy
-	   :ensure t)
-	 (use-package ace-window
-	   :ensure t)
-	 (key-chord-mode t)
-	 (key-chord-define-global "jj" 'avy-goto-word-1)
-	 (key-chord-define-global "jl" 'avy-goto-line)
-	 (key-chord-define-global "jw" 'ace-window)
-	 (avy-setup-default))
-     #+END_SRC
+
+*** Browser-like back/forward buttons
+
+    We can use the emacs [[https://www.emacswiki.org/emacs/BackButton][back button]] for browser-like navigation. So
+    long as the toolbar is left on, we'll get back and forward buttons
+    in the toolbar. If you want to navigate backwards and forwards
+    with the keyboard, use the following:
+    - For backwards ~C-x <left>~ or ~C-x C-<left>~.
+    - For forwards ~C-x <right>~ or ~C-x C-<right>~.
+    #+BEGIN_SRC emacs-lisp
+      (use-package back-button
+	:ensure t
+	:commands back-button-mode)
+      (back-button-mode 1)
+    #+END_SRC
+
+*** Jumping the cursor around
+    I like to be able to navigate quickly to wherever on the screen I
+    happen to be looking. I do this with [[https://github.com/abo-abo/avy][avy]]. Since navigation is
+    pretty much the most common thing I do in an editor, I want
+    shortcuts that are extremely short, and that don't clash with any
+    of the other millions of shortcuts in the emacs ecosystem. To get
+    this, I use [[https://www.emacswiki.org/emacs/KeyChord][key-chords]]:
+    - If you mash ~jl~, every line on screen will get a two-character
+      label. Type the label to jump to that line.
+    - If you mash ~jw~, every window on screen will get a one-character
+      label. Type the label to jump to that line[fn:1].
+    - If you mash ~jj~, you get prompted for a character. Type the
+      first character of the word you want to jump to. Now all words
+      that begin with that character will be labelled. Type the label
+      to jump to that word.
+      #+BEGIN_SRC emacs-lisp
+	(use-package key-chord
+	  :ensure t
+	  :config
+	  (use-package avy
+	    :ensure t)
+	  (use-package ace-window
+	    :ensure t)
+	  (key-chord-mode t)
+	  (key-chord-define-global "jj" 'avy-goto-word-1)
+	  (key-chord-define-global "jl" 'avy-goto-line)
+	  (key-chord-define-global "jw" 'ace-window)
+	  (avy-setup-default))
+      #+END_SRC
 
 ** Multiple-cursor editing
    Allow editing with [[https://github.com/magnars/multiple-cursors.el][multple cursors]]. There's a good [[http://emacsrocks.com/e13.html][introduction video here]].
