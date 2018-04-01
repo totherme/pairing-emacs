@@ -192,6 +192,17 @@
       wdired-allow-to-change-permissions t)
      (define-key dired-mode-map "r" 'wdired-change-to-wdired-mode)
    #+END_SRC
+
+   Let's have a [[https://github.com/scrooloose/nerdtree][NERDTree]]-like file browser. There's one called
+   [[https://github.com/jaypei/emacs-neotree][neotree]]. We'll bind it to `<f8>`, to toggle on and off.
+
+   #+BEGIN_SRC emacs-lisp
+     (use-package neotree
+       :ensure t
+       :commands neotree-toggle
+       :bind (("<f8>" . neotree-toggle)))
+   #+END_SRC
+
 ** Make Backups More Sensible
 
    - Don't clobber symlinks with backup files
