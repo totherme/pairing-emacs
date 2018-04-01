@@ -6,3 +6,4 @@ auto-save-list
 /emacs-custom.el~
 /configs/basics.el
 /configs/magit.el
+/configs/programming.el

@@ -1,0 +1,215 @@
+* Programming
+
+  Use [[http://www.flycheck.org/en/latest/][flycheck]] for on-the-fly type checking.
+
+  #+BEGIN_SRC emacs-lisp
+    (use-package flycheck
+	:ensure t
+	:commands flycheck-mode)
+  #+END_SRC
+
+  Use [[https://company-mode.github.io/][company mode]] for autocompletion of All The Things. Tweak a few
+  parameters while we're at it:
+  - Summon autocompletion with ~C-c C-n~ or ~C-c M-n~.
+  - Have the autocompletion popup appear in 0.2 seconds rather than the default 0.5 seconds.
+    + Except when we're writing plain text -- that would just be
+      irritating. In plain text files, we can always summon
+      autocompletion explicitly if we want..
+  - Make the autocompletion popup bigger -- show 20 candidates at a time instead of 10.
+  #+BEGIN_SRC emacs-lisp
+    (use-package company
+      :ensure t
+      :commands global-company-mode
+      :init
+      (add-hook 'after-init-hook 'global-company-mode)
+      :config
+      (global-set-key (kbd "C-c C-n") 'company-complete)
+      (global-set-key (kbd "C-c M-n") 'company-complete)
+      (setq company-idle-delay .2)
+      (add-hook 'text-mode-hook (lambda () 
+				  (set (make-local-variable 'company-idle-delay) nil))))
+      (setq company-tooltip-limit 20)
+  #+END_SRC
+
+  Use [[https://github.com/joaotavora/yasnippet][the YASnippet template system]] for typing common things (boilerplate, etc) in various languages.
+  #+BEGIN_SRC emacs-lisp
+    (use-package yasnippet
+      :ensure t
+      :init
+      (add-hook 'after-init-hook 'yas-global-mode))  
+  #+END_SRC
+  
+** Shell Scripting
+   If [[https://www.shellcheck.net/][shellcheck]] is in the ~$PATH~, we can use it with flycheck.
+   #+BEGIN_SRC emacs-lisp
+   (add-hook 'sh-mode-hook 'flycheck-mode)
+   #+END_SRC
+
+** Elisp
+   Use paredit to make it harder to accidentally write syntactically
+   incorrect lisp.
+   #+BEGIN_SRC emacs-lisp
+     (use-package paredit
+       :ensure t
+       :commands paredit-mode
+       :init
+       (add-hook 'emacs-lisp-mode-hook 'paredit-mode))
+   #+END_SRC
+
+** Golang
+
+*** Basics
+    The emacs [[https://github.com/dominikh/go-mode.el][go mode]] will provide a bunch of useful things on its own. Including:
+    - integration with ~gofmt~
+    - integration with ~godoc~
+    - integration the Playground
+    - automatic import management
+    - code introspection with ~godef~
+    - test coverage displays
+    - various handy code navigation shortcuts
+    - semi-automatic ~$GOPATH~ detection -- call ~M-x go-set-project~
+      if you think your ~$GOPATH~ isn't currently set right.
+    #+BEGIN_SRC emacs-lisp
+      ;; Setup all the golang magic
+      (use-package go-mode
+	:ensure t)
+    #+END_SRC
+
+    Use goimports instead of gofmt. It's just better.
+    #+BEGIN_SRC emacs-lisp
+      (setq gofmt-command "goimports")
+    #+END_SRC
+    ...and gofmt when we save
+    #+BEGIN_SRC emacs-lisp
+      (add-hook 'before-save-hook 'gofmt-before-save)
+    #+END_SRC
+
+    [[https://github.com/dominikh/yasnippet-go][YASnippet-go]] is a collection of snippets for go dev. They're
+    submoduled into this repo, and we enable them like so:
+    #+BEGIN_SRC emacs-lisp
+      (add-to-list 'yas-snippet-dirs  "~/.emacs.d/yasnippet-go")
+    #+END_SRC
+
+    
+*** GOPATH wrangling
+
+    If you start emacs from a shell which has a ~$GOPATH~ already set
+    in it, we'll just use that. However, sometimes when emacs is
+    started from OSX Finder or a Linux window manager, the environment
+    isn't properly set up for go development. So, if we detect that
+    there's no ~$GOPATH~ set, we'll use [[https://github.com/purcell/exec-path-from-shell][exec-path-from-shell]] to grab
+    it, and the ~$PATH~ variable too.
+    #+BEGIN_SRC emacs-lisp
+      (unless (getenv "GOPATH")
+	(use-package exec-path-from-shell
+	  :ensure t
+	  :config
+	  (exec-path-from-shell-initialize)
+	  (exec-path-from-shell-copy-env "GOPATH")
+	  (exec-path-from-shell-copy-env "PATH")))
+    #+END_SRC
+
+    Notice that we only do this if the ~$GOPATH~ is currently
+    unset. If you want to use [[https://direnv.net/][direnv]] to set a different ~$PATH~ and
+    ~$GOPATH~ for every different project in your home dir, then
+    that's fine -- you can start a separate emacs in each project, and
+    they'll all have the ~$GOPATH~ and ~$PATH~ variables you expected.
+
+    However, it's often useful to have a single [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Command-History.html][command history]], [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Kill-Ring.html][kill
+    ring]], and so on for all your projects. For this reason, you might
+    like to try just opening a single emacs, and using ~M-x
+    go-set-project~ to manage your ~$GOPATH~.
+
+*** Key and Mouse Bindings
+    We need a little setup to enable IDE-like control-click for code
+    introspection. First a function to move the cursor to where you
+    just clicked, and then perform the introspection.
+    #+BEGIN_SRC emacs-lisp
+      (defun my-golang-introspect (event)
+	"Move the point to the mouse, and try to do godef-jump.
+
+	For IDE-like code introspection on mouse events like Control-Click"
+	(interactive "e")
+	(mouse-set-point event)
+	(godef-jump (point)))
+    #+END_SRC
+
+    Unfortunately there is already a function globally bound to the
+    mouse-down portion of control-click. When we try to bind our
+    introspection function to the whole click, this mouse-down
+    function will get in the way. We're going to want to keep it for
+    everything except golang buffers, so we'll have to overwrite it
+    locally with something harmless.
+    #+BEGIN_SRC emacs-lisp
+      (defun my-do-nothing ()
+	(interactive))
+    #+END_SRC
+
+    Now actually bind the keys:
+    - Use ~C-c m~ to manually trigger a go format (otherwise it'll happen automatically on save anyway)
+    - Use ~C-c C-e~ to ask what compile error is under point.
+    - Use ~M-.~ (which means ~Alt-.~ on practically all keyboards
+      these days) or Control-Click for code introspection ("go to definition").
+    #+BEGIN_SRC emacs-lisp
+      (defun my-go-keybindings ()
+	(local-set-key (kbd "C-c m") 'gofmt)
+	(local-set-key (kbd "C-c C-e") 'flymake-popup-current-error-menu)
+	(local-set-key (kbd "M-.") 'godef-jump)
+	(local-set-key (kbd "C-<mouse-1>") 'my-golang-introspect)
+	(local-set-key (kbd "C-<down-mouse-1>") 'my-do-nothing))
+      (add-hook 'go-mode-hook 'my-go-keybindings)
+    #+END_SRC
+
+*** On-the-fly typechecking and docs
+    The [[https://github.com/dougm/goflymake][go backend for flymake]] (to give us on-the-fly typechecking)
+    isn't available in MELPA, so we provide it as a git submodule. The
+    [[https://github.com/syohex/emacs-go-eldoc/tree/cbbd2ea1e94a36004432a9ac61414cb5a95a39bd][go backend]] for [[https://www.emacswiki.org/emacs/ElDoc][eldoc]] (which shows the type and argument list of
+    the function you're calling) is in MELPA, so we can get that the
+    usual way.
+    #+BEGIN_SRC emacs-lisp
+      (use-package go-flymake
+	:load-path "~/.emacs.d/goflymake")
+      (add-hook 'go-mode-hook 'flymake-mode)
+      (use-package go-eldoc
+	:ensure t)
+      (add-hook 'go-mode-hook 'go-eldoc-setup)
+    #+END_SRC
+
+*** Autocompletion
+    Use the company-go backend to provide smart (type-driven) autocompletion for go.
+    #+BEGIN_SRC emacs-lisp
+      (use-package company-go
+	:ensure t)
+    #+END_SRC
+    In particular, note that this backend supports godocs. This means
+    that if you're looking at a bunch of possible completions for your
+    line, and want to learn more about the function you're about to
+    call, you can just highlight the candidate completion, and hit
+    ~<f1>~.
+    #+CAPTION: Hit ~<f1>~ for docs
+    [[./images/company-autocomplete-plus-docs.png]]
+
+    Use the go-backend precisely (always and only) when we're editing golang files.
+
+    #+BEGIN_SRC emacs-lisp
+      (defun my-company-go-backend ()
+	(set (make-local-variable 'company-backends) '(company-go))
+	(company-mode))
+      (add-hook 'go-mode-hook 'my-company-go-backend)
+    #+END_SRC
+
+** Markdown
+
+   Use [[https://jblevins.org/projects/markdown-mode/][markdown mode]] for editing markdown. 
+   #+BEGIN_SRC emacs-lisp
+     (use-package markdown-mode
+       :ensure t)
+   #+END_SRC
+
+** YAML
+
+   Use [[https://www.emacswiki.org/emacs/YamlMode][yaml mode]] for editing yaml.
+   #+BEGIN_SRC emacs-lisp
+     (use-package yaml-mode
+       :ensure t)   
+   #+END_SRC
