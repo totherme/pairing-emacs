@@ -121,6 +121,11 @@ directory. Some highlights are listed below.
 - The mouse should work. Even at the terminal. Try clicking to move
   the cursor, or highlighting text, or activating a menu at the top of
   the screen.
+- When editing go code, you can use `Control-Click` to introspect
+  (using `godef`) the thing you clicked.
+- There are browser-like "back" and "forward" buttons. You can use
+  `C-x <left>` and `C-x <right>`, and in the GUI they're also
+  available in the toolbar.
 - Autocompletion is available for everything. 
   + It pops up by default for programming languages, but not for plain text.
   + If you want to summon it explicitly, hit `C-c C-n` or `C-c M-n`.
