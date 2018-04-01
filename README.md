@@ -92,6 +92,12 @@ ln -s ~/.emacs.d/tmux.conf ~/.tmux.conf
 If you don't yet know how to save a file in emacs, see [Learning more
 about emacs](#learning-more-about-emacs) below.
 
+If you want to dive in and see all the things that are bundled and
+enabled here, take a look at the [basic editing
+features](configs/basics.org), [git features](configs/magit.org), and
+[programming features](configs/programming.org) enabled in our config
+directory. Some highlights are listed below.
+
 ## Non-standard features enabled here by default
 - Line numbers. Every file you open will have line numbers displayed
   on the left hand side. This can be useful when remote pairing so you
