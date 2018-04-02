@@ -71,14 +71,24 @@
     long as the toolbar is left on, we'll get back and forward buttons
     in the toolbar. If you want to navigate backwards and forwards
     with the keyboard, use the following:
-    - For backwards ~C-x C-<left>~.
-    - For forwards ~C-x C-<right>~.
+    - For backwards ~C-x C-<left>~ or ~C-x <left>~.
+    - For forwards ~C-x C-<right>~ or ~C-x <right>~.
     #+BEGIN_SRC emacs-lisp
       (use-package back-button
 	:ensure t
 	:commands back-button-mode)
       (back-button-mode 1)
+      (global-set-key (kbd "C-x <left>") 'back-button-global-backward)
+      (global-set-key (kbd "C-x <right>") 'back-button-global-forward)
     #+END_SRC
+
+    Note that by default, the =back button= package uses ~C-x <left>~
+    and ~C-x <right>~ for moving backward and forward in the current
+    buffer only. To go backwards and forwards across buffers, you need
+    to use ~C-x C-<left>~ and ~C-x C-<right>~. Unfortunately
+    ~C-<left>~ and ~C-<right>~ don't work at the termina. Since we
+    think that inter-buffer (global) movement is more valuable than
+    the local movement, we map both sets of shortcuts to that.
 
 *** Jumping the cursor around
     I like to be able to navigate quickly to wherever on the screen I

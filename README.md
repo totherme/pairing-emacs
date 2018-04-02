@@ -124,7 +124,7 @@ directory. Some highlights are listed below.
 - When editing go code, you can use `Control-Click` to introspect
   (using `godef`) the thing you clicked.
 - There are browser-like "back" and "forward" buttons. You can use
-  `C-x C-<left>` and `C-x C-<right>`, and in the GUI they're also
+  `C-x <left>` and `C-x <right>`, and in the GUI they're also
   available in the toolbar.
 - Autocompletion is available for everything. 
   + It pops up by default for programming languages, but not for plain text.
