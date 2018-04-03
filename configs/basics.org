@@ -75,11 +75,11 @@
     - For forwards ~C-x C-<right>~ or ~C-x <right>~.
     #+BEGIN_SRC emacs-lisp
       (use-package back-button
-	:ensure t
-	:commands back-button-mode)
+        :ensure t
+        :commands back-button-mode)
       (back-button-mode 1)
-      (global-set-key (kbd "C-x <left>") 'back-button-global-backward)
-      (global-set-key (kbd "C-x <right>") 'back-button-global-forward)
+      (define-key back-button-mode-map (kbd "C-x <left>") 'back-button-global-backward)
+      (define-key back-button-mode-map (kbd "C-x <right>") 'back-button-global-forward)
     #+END_SRC
 
     Note that by default, the =back button= package uses ~C-x <left>~
