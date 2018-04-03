@@ -38,7 +38,18 @@
       :init
       (add-hook 'after-init-hook 'yas-global-mode))  
   #+END_SRC
-  
+** Compilation
+   Compilation buffers aren't coloured by default. This means ginkgo
+   output is almost impossible to read. Let's try to fix that.
+
+   #+BEGIN_SRC emacs-lisp
+     (require 'ansi-color)
+     (defun colorize-compilation-buffer ()
+       (toggle-read-only)
+       (ansi-color-apply-on-region compilation-filter-start (point))
+       (toggle-read-only))
+     (add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
+   #+END_SRC
 ** Shell Scripting
    If [[https://www.shellcheck.net/][shellcheck]] is in the ~$PATH~, we can use it with flycheck.
    #+BEGIN_SRC emacs-lisp
