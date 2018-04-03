@@ -4,3 +4,6 @@
 [submodule "goflymake"]
 	path = goflymake
 	url = https://github.com/dougm/goflymake
+[submodule "magit-toolbar"]
+	path = magit-toolbar
+	url = https://github.com/totherme/magit-toolbar

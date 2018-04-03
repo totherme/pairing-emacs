@@ -9,6 +9,12 @@
       :commands (magit-status)
       :bind (("C-x g" . magit-status)))
   #+END_SRC
+
+** Adding a toolbar icon
+   #+BEGIN_SRC emacs-lisp
+     (add-to-list 'load-path "~/.emacs.d/magit-toolbar")
+     (require 'magit-toolbar)
+   #+END_SRC
 ** Making magit work with [[https://github.com/git-duet/git-duet][git-duet]]
    If you like, you can explicitly configure magit to work with either
    ~git commit~ or ~git duet commit~, using customize or ~(setq
