@@ -63,6 +63,14 @@
      (setq ido-auto-merge-work-directories-length -1)
    #+END_SRC
 
+   Use the [[https://github.com/bbatsov/solarized-emacs][solarized theme]] to make emacs' colours a little prettier.
+   #+BEGIN_SRC emacs-lisp
+     (use-package solarized-theme
+       :ensure t)
+
+     (load-theme 'solarized-light)
+   #+END_SRC
+
 ** Navigation
 
 *** Browser-like back/forward buttons
