@@ -71,7 +71,7 @@
 	   (use-package solarized-theme
 	     :ensure t)
 
-	   (load-theme 'solarized-light)))
+	   (load-theme 'solarized-light t)))
    #+END_SRC
 
 ** Navigation
