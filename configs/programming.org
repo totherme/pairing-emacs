@@ -241,3 +241,78 @@
      (use-package yaml-mode
        :ensure t)   
    #+END_SRC
+
+** Ruby
+
+   Use [[https://github.com/zenspider/enhanced-ruby-mode][enhanced ruby mode]] for better colouring and syntax checking.
+   #+BEGIN_SRC emacs-lisp
+     (use-package enh-ruby-mode
+       :ensure t)
+
+     (add-to-list 'auto-mode-alist
+		  '("\\(?:\\.rb\\|ru\\|rake\\|thor\\|jbuilder\\|gemspec\\|podspec\\|/\\(?:Gem\\|Rake\\|Cap\\|Thor\\|Vagrant\\|Guard\\|Pod\\)file\\)\\'" . enh-ruby-mode))
+   #+END_SRC
+
+   Use [[https://github.com/pd/yard-mode.el][yard mode]] for handling [[https://yardoc.org/][ruby yardocs]].
+
+   #+BEGIN_SRC emacs-lisp
+     (use-package yard-mode
+       :ensure t)
+
+     (add-hook 'enh-ruby-mode-hook 'yard-mode)
+   #+END_SRC
+
+   Use [[https://github.com/bbatsov/rubocop][rubocop]] for on-the-fly linting.
+   #+BEGIN_SRC emacs-lisp
+     (use-package rubocop
+       :ensure t)
+     (add-hook 'enh-ruby-mode-hook 'rubocop-mode)
+   #+END_SRC
+
+   Use [[https://github.com/dgutov/robe][robe mode]] for IDE-like features.
+   #+BEGIN_SRC emacs-lisp
+     (use-package robe
+       :ensure t)
+
+     (add-hook 'enh-ruby-mode-hook 'robe-mode)
+   #+END_SRC
+
+   From the robe readme, note these dependencies:
+
+   #+BEGIN_QUOTE
+   - pry
+   - pry-doc >= 0.6.0 (on MRI)
+   - method_source >= 0.8.2 (for compatibility with the latest Rubinius)
+   Note that if your project is using Bundler, the dependencies have to be added to the Gemfile.
+   #+END_QUOTE
+
+   Use robe-mode's autocompletion kit with the company autocompletion
+   framework we set up earlier.
+
+   #+BEGIN_SRC emacs-lisp
+     (eval-after-load 'company
+       '(push 'company-robe company-backends))
+   #+END_SRC
+
+*** Mouse bindings
+    Just as in golang, we can bind control-click to code introspection.
+
+    #+BEGIN_SRC emacs-lisp
+      (defun my-ruby-introspect (event)
+	"Move the point to the mouse, and try to do robe-jump.
+
+	 For IDE-like code introspection on mouse events like Control-Click"
+	(interactive "e")
+	(mouse-set-point event)
+	(robe-jump (point)))
+
+      (defun my-ruby-keybindings ()
+	      (local-set-key (kbd "C-<mouse-1>") 'my-ruby-introspect)
+	      (local-set-key (kbd "C-<down-mouse-1>") 'my-do-nothing))
+      (add-hook 'enh-ruby-mode-hook 'my-ruby-keybindings)
+
+    #+END_SRC
+
+**** TODO Reduce code duplication
+     The same trick is described both here and in the golang
+     section. Extract it.
