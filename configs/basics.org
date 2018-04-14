@@ -40,6 +40,31 @@
        (xterm-mouse-mode))
    #+END_SRC
 
+** Project Management
+   By default, emacs likes to think of things at the granularity of
+   files (or "[[https://www.gnu.org/software/emacs/manual/html_node/emacs/Buffers.html#Buffers][buffers]]", which is roughly an open file). However,
+   [[https://github.com/bbatsov/projectile][projectile mode]] helps us think about "a project" as a thing that
+   can be opened, and a context in which we can do things. For example
+   "find a file in this project" or "find this text in a project" or
+   similar.
+   #+BEGIN_SRC emacs-lisp
+     (use-package projectile
+       :ensure t)
+     (projectile-mode)
+   #+END_SRC
+
+   Now that we have projectile mode, we can bind a key for
+   "control-p"- or "command-t"-like behaviour -- a fuzzy filename
+   matcher that opens files in the current project. It's bound to ~C-c
+   p g~ by default. Let's also bind it to command-p.
+
+   #+BEGIN_SRC emacs-lisp
+     (global-set-key (kbd "s-p") 'projectile--find-file-dwim)
+   #+END_SRC
+
+   You can ask emacs for all the other project-related shortcuts by
+   typing ~C-c p ?~.
+
 ** Visual Stuff
    Display line numbers -- this is especially useful when
    pair-programming.
