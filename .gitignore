@@ -8,3 +8,4 @@ auto-save-list
 /configs/magit.el
 /configs/programming.el
 var
+/projectile-bookmarks.eld

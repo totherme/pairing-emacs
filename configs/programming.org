@@ -1,3 +1,6 @@
+#+STARTUP: fnadjust
+#+OPTIONS: f:t
+
 * Programming
 
   Use [[http://www.flycheck.org/en/latest/][flycheck]] for on-the-fly type checking.
@@ -318,30 +321,86 @@
      section. Extract it.
 
 ** Haskell
-   First, the basic haskell mode that other haskell goodies are built on.
+   First, we'll definitely need the basic haskell mode that other
+   haskell goodies are built on.
    #+BEGIN_SRC emacs-lisp
      (use-package haskell-mode
        :ensure t)
    #+END_SRC
 
    Now we want some IDE-like features. There are a few options here,
-   but recent popular ones appear to be [[http://commercialhaskell.github.io/intero/][Intero]] and [[https://github.com/jyp/dante][Dante]]. I'd like to
-   try Dante.
+   but recent popular ones appear to be [[http://commercialhaskell.github.io/intero/][Intero]] and [[https://github.com/jyp/dante][Dante]]. It seems
+   that Intero works best if your haskell project happens to use
+   stack[fn:1], but Dante is better for casual scripting with ghci or just
+   cabal[fn:2].
 
-   #+BEGIN_SRC emacs-lisp
-     (use-package dante
-       :ensure t
-       :after haskell-mode
-       :commands 'dante-mode
-       :init
-       (add-hook 'haskell-mode-hook 'dante-mode)
-       (add-hook 'haskell-mode-hook 'flycheck-mode))
-   #+END_SRC
+   Let's make Dante our default, but retain the option to use Intero
+   if we want it.
 
-   ...and we can activate the hlint checker too.
+*** Dante
 
-   #+BEGIN_SRC emacs-lisp
-     (add-hook 'dante-mode-hook
-        '(lambda () (flycheck-add-next-checker 'haskell-dante
-                     '(warning . haskell-hlint))))
-   #+END_SRC
+    This snippit is copied verbatim from the [[https://github.com/jyp/dante][Dante README]].
+
+    #+BEGIN_SRC emacs-lisp
+      (use-package dante
+       	:ensure t
+       	:after haskell-mode
+       	:commands 'dante-mode
+       	:init
+       	(add-hook 'haskell-mode-hook 'dante-mode)
+       	(add-hook 'haskell-mode-hook 'flycheck-mode))
+    #+END_SRC
+
+    ...and we can activate the [[https://hackage.haskell.org/package/hlint][hlint]] checker too.
+
+    #+BEGIN_SRC emacs-lisp
+      (add-hook 'dante-mode-hook
+         '(lambda () (flycheck-add-next-checker 'haskell-dante
+                      '(warning . haskell-hlint))))
+    #+END_SRC
+
+*** Intero
+    First, we should ensure that intero is available if we want it,
+    and that its [[https://hackage.haskell.org/package/hlint][hlint]] function is turned on.
+    #+BEGIN_SRC emacs-lisp
+      (use-package intero
+        :ensure t
+        :config
+        (flycheck-add-next-checker 'intero '(warning . haskell-hlint)))
+    #+END_SRC
+
+*** Switching between them
+    To switch from Dante to Intero and back, we provide
+    ~my-haskell-switch-to-intero~ and
+    ~my-haskell-switch-to-dante~. These will have no effect on any
+    currently open haskell buffers, but will allow you to switch the
+    defaults for any buffers you open in future.
+
+    So the workflow for editing a stack project is:
+    - ~M-x my-haskell-switch-to-intero~
+    - ~C-x C-f ~/my-stack-project/main.hs~ (or similar)
+
+    #+BEGIN_SRC emacs-lisp
+      (defun my-haskell-switch-to-intero ()
+        "Use Intero instead of Dante for all future haskell editing."
+        (interactive)
+        (remove-hook 'haskell-mode-hook 'dante-mode)
+        (remove-hook 'haskell-mode-hook 'flycheck-mode)
+        (add-hook 'haskell-mode-hook 'intero-mode))
+
+      (defun my-haskell-switch-to-dante ()
+        "Use Dante instead of Intero for all future haskell editing."
+        (interactive)
+        (remove-hook 'haskell-mode-hook 'intero-mode)
+        (add-hook 'haskell-mode-hook 'dante-mode)
+        (add-hook 'haskell-mode-hook 'flycheck-mode))
+    #+END_SRC
+
+* Footnotes
+
+[fn:1] For example, if your stack project has different targets with
+different build-depends lines, then intero can understand which
+imports are available in any/all of them using ~M-x intero-targets~.
+
+[fn:2] Intero doesn't work at all without stack. Dante does.
+
