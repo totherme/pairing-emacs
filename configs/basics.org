@@ -265,6 +265,16 @@
 	version-control t)
    #+END_SRC
 
+** Don't close files when I type cmd-k
+
+   The cmd-k shortcut is used for navigation in slack on mac. In emacs
+   on mac, it seems to be set to kill the current buffer. Let's stop
+   that.
+
+   #+BEGIN_SRC emacs-lisp
+     (global-unset-key (kbd "s-k"))
+   #+END_SRC
+
 * Org-mode config
   
   By default, org-mode will only export to ascii, html, icalendar, and
