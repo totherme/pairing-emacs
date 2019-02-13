@@ -138,6 +138,8 @@ directory. Some highlights are listed below.
     the `git-duet-enabled` variable. You can do this with `M-x
     customize-variable` followed by `git-duet-enabled`. Whatever
     change you make will be saved for future sessions.
+- If you keep your github keys in lastpass, you can [load them from
+  within emacs](configs/internetting.org).
 - [Avy mode](https://github.com/abo-abo/avy). This is a way of quickly
   moving the cursor around a file.
   + If you quickly double-tap the `j` key, emacs will ask you for the
@@ -148,7 +150,7 @@ directory. Some highlights are listed below.
     to jump to.
   + If you mash `j` and `w`, emacs will prompt for which internal
     window you want to jump to.
- - [Multiple-cursor
+- [Multiple-cursor
    mode](https://github.com/magnars/multiple-cursors.el). If you
    highlight the an instance of the word `foo` in your file, then
    `C->` will cause the next instance to also be highlighted, and so
