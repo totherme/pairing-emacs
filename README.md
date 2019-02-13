@@ -103,18 +103,13 @@ directory. Some highlights are listed below.
   on the left hand side. This can be useful when remote pairing so you
   can talk about your code with a common reference point. If you don't
   like it, switch it off with `M-x global-linum-mode`.
-- The following windows-like keyboard shortcuts are enabled. You can
-  disable them with `M-x cua-mode`
-  + `C-c` is "copy to clipboard"
-  + `C-v` is "paste from clipboard"
-  + `C-x` is "cut to clipboard"
-  + `C-z` is "undo"
-  + If you highlight some text and start typing, the highlighted text
-    will be replaced with the new text that you're typing.
-- In addition to the windows-like `C-z` for "undo", the emacs-like
-  `C-/` and `C-_` also work. For "redo" we only have the emacs-like
-  shortcuts `C-?` and `M-_`. Note that `C-?` won't work at the
-  terminal, because on terminals `C-?` is equivalent to `DEL`.
+- Tree-based undo/redo. You can "undo" with `C-/` and `C-_`. For
+  "redo" you can use `C-?` and `M-_`. Note that `C-?` won't work at
+  the terminal, because on terminals `C-?` is equivalent to `DEL`. If
+  having a "redo" button in emacs doesn't surpise you then this is
+  only of historical interest. You can read what the old world used to
+  look like
+  [here](https://www.gnu.org/software/emacs/manual/html_node/emacs/Undo.html#Undo).
 - You can [naviate your entire undo
   history](http://www.dr-qubit.org/undo-tree.html), including branches
   that you previously edited over the top of, using `C-x u`.
@@ -163,6 +158,18 @@ directory. Some highlights are listed below.
    cursor. Annoyingly, the `C->` and `C-<` shortcuts don't work at the
    terminal because the terminal doesn't distinguish between `C-.` and
    `C->`.
+
+## Pairing with windows-programmers
+
+If you do `M-x cua-mode` then the following windows-like keyboard
+shortcuts will be enabled:
+- `C-c` is "copy to clipboard"
+- `C-v` is "paste from clipboard"
+- `C-x` is "cut to clipboard"
+- `C-z` is "undo"
+- If you highlight some text and start typing, the highlighted text
+  will be replaced with the new text that you're typing.
+
 
 ## Tmux
 

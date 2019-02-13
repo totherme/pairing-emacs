@@ -269,6 +269,21 @@
      (global-unset-key (kbd "s-k"))
    #+END_SRC
 
+** Optional windows-friendly shortcuts
+   I'd like this config to be pretty friendly to folks who're used to
+   "normal" IDEs like IntelliJ. But I also want to be able to use
+   things like the cool [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Rectangles.html#Rectangles][emacs rectangle editing
+   functions]]. Unfortunately, all the rectancle shortcuts begin with
+   =C-x=, which windows users will expect to mean =cut to clipboard=.
+
+   We can toggle between windows-style and emacs-style with =M-x
+   cua-mode=. If you're pairing with someone who expects windows-style
+   shortcuts, do that.
+
+*** TODO Add a toolbar button for toggling ~cua-mode~ on and off.
+    It's a pain to remember that command, so I windows logo in the
+    toolbar would probably be easier.
+
 * Org-mode config
   
   By default, org-mode will only export to ascii, html, icalendar, and
@@ -292,5 +307,4 @@
 label-and-choose step, and just jump you straight into the other
 window.
 
-[fn:2] Unless you've disabled cua-mode. In which case only the
-emacs-like shortcuts are available to you.
+[fn:2] So long as you've enabled ~cua-mode~. See [[*Optional windows-friendly shortcuts][Optional windows-friendly shortcuts]] above.
