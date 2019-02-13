@@ -213,6 +213,12 @@
      (advice-add 'undo-tree-visualizer-set :after #'undo-tree-visualizer-update-linum)
    #+END_SRC
 
+   
+*** TODO Add toolbar button for =redo= and ~undo-tree-visualize~
+    Having sensible undo/redo shortcuts is great, but it'd be even
+    better to have toolbar buttons for more than just the =undo= part
+    of the picture.
+
 ** Handy Tools
    Start a shell with a single keypress.
    #+BEGIN_SRC emacs-lisp
