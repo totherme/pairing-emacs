@@ -70,6 +70,16 @@
        (add-hook 'emacs-lisp-mode-hook 'paredit-mode))
    #+END_SRC
 
+   Use rainbow-parens to make it easier to read the lisp we're writing
+
+   #+BEGIN_SRC emacs-lisp
+     (use-package rainbow-delimiters
+       :ensure t
+       :commands rainbow-delimiters-mode
+       :init
+       (add-hook 'emacs-lisp-mode-hook 'rainbow-delimiters-mode))
+   #+END_SRC
+
 ** Golang
 
 *** Basics
