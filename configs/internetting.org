@@ -142,6 +142,11 @@
     Because I hadn't yet figured out how to use lexical variables in
     org-tangled emacs-lisp files, I'm using a global variable to store
     a temporary file name. This is at best ugly.
+
+*** TODO More varied key times than just one hour
+    Right now we just load keys for an hour at a time. It'd be nice to
+    have the option to load them until 6pm, for a standard working
+    day.
 ** Slack
 
    It'd be great to use the [[https://github.com/yuya373/emacs-slack][slack package]] to connect to [[https://slack.com][slack]]. 
