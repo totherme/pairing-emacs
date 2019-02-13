@@ -290,6 +290,22 @@
     It's a pain to remember that command, so I windows logo in the
     toolbar would probably be easier.
 
+    
+** Enable narrowing
+   [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Narrowing.html][Narrowing]] is a handy trick that focuses your editor on a small part
+   of a potentially very large file. This can be useful when
+   presenting work to other people, or for scoping a semi-automated
+   edit. For example, suppose I wanted to use a keyboard macro to edit
+   many instances of a common pattern, but only within one section of
+   my file. If I narrow to that section before editing, then my macro
+   cannot accidentally affect the rest of the file.
+
+   Narrowing is turned off by default, so let's turn it on:
+
+   #+BEGIN_SRC emacs-lisp
+     (put 'narrow-to-region 'disabled nil)
+   #+END_SRC
+
 * Org-mode config
   
   By default, org-mode will only export to ascii, html, icalendar, and
