@@ -63,6 +63,8 @@
        (message "Lastpass logged out"))
    #+END_SRC
 
+*** TODO Bug -- ~gds-ensure-lastpass-logged-in~ returns before its async process has logged in :(
+    
 *** TODO Known issue -- 2fa push notifications
     Note that if you use a push notification like the lastpass
     authenticator, then you have the option to *either* enter a 6
@@ -98,27 +100,48 @@
 
        (gds-lastpass-ensure-logged-in)
 
-       (let ((key) (shell-command-to-string
-		    "lpass show Personal/github-ssh-key --notes"))
+       ;; If this function has previously hung, there might be stuff to clean up.
+       (when (and (boundp 'gds-temp-keyfile) (file-exists-p gds-temp-keyfile))
+	 (delete-file gds-temp-keyfile))
 
-	 (when (get-process "ssh-add-github") ; Kill any previous stalled ssh-add attempt
-	   (delete-process "ssh-add-github"))
+       (defvar gds-temp-keyfile (make-temp-file "gdskeyfile")
+	 "The path to a temporary file for storing an SSH key. 
 
-	 (let ((process (start-process-shell-command
-			 "ssh-add-github"
-			 nil
-			 (concat "ssh-add -t 15 <(echo " (shell-quote-argument key) ")"))))
+	  Needed so we can delete that file as soon as we're done with it.
 
-	   (set-process-filter
-	    process
-	    (lambda (proc string)
-	      (when (string-match-p (regexp-quote "Enter passphrase for") string)
-		(process-send-string proc
-				     (concat (read-passwd "Key passphrase? ") "\n"))))))))
+	 This should really be a lexically bound local variable, but gds
+	 hasn't figured out how to do that in org-mode yet.")
+
+       (with-temp-file gds-temp-keyfile)
+       (set-file-modes gds-temp-keyfile #o0600)
+       (with-temp-file gds-temp-keyfile
+	 (insert (shell-command-to-string
+		  "lpass show Personal/github-ssh-key --notes")))
 
 
+       (when (get-process "ssh-add-github") ; Kill any previous stalled ssh-add attempt
+	 (delete-process "ssh-add-github"))
+
+       (let ((process (start-process-shell-command
+		       "ssh-add-github"
+		       nil
+		       (concat "ssh-add -t 3600 " gds-temp-keyfile ))))
+
+	 (set-process-filter
+	  process
+	  (lambda (proc string)
+	    (when (string-match-p (regexp-quote "Enter passphrase for") string)
+	      (process-send-string proc
+				   (concat (read-passwd "Key passphrase? ") "\n")))
+	    (when (string-match-p (regexp-quote "Identity added") string)
+	      (delete-file gds-temp-keyfile)
+	      (message "SSH Key successfully loaded"))))))
    #+END_SRC
 
+*** TODO Known issue -- Leaky temporary file name
+    Because I hadn't yet figured out how to use lexical variables in
+    org-tangled emacs-lisp files, I'm using a global variable to store
+    a temporary file name. This is at best ugly.
 ** Slack
 
    It'd be great to use the [[https://github.com/yuya373/emacs-slack][slack package]] to connect to [[https://slack.com][slack]]. 
