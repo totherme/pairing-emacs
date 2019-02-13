@@ -1,0 +1,134 @@
+* Internetting
+
+  For those that like the UI emacs provides (or perhaps just enjoy the
+  uniformity of using the same UI for programming and for everything
+  else), emacs can be used to read email, and do various other
+  internettey things.
+
+** Lastpass
+
+   Of course in order to do anything on the internet, we'll need
+   credentials. And storing those in a config file in git would be
+   unwise. Let's keep them in lastpass!
+
+   Unhappily, as I write this, the [[https://melpa.org/#/lastpass][lastpass module on melpa]] hasn't
+   been updated in over a year, and doesn't seem to work with the
+   latest CLI. So we'll have to roll our own for the tiny things we
+   want.
+
+   The bare minimum is to be able to log in and out. Let's assume that
+   the =lpass= CLI is in the ~$PATH~.
+
+   #+BEGIN_SRC emacs-lisp
+     (defun gds-lastpass-ensure-logged-in ()
+       "Ensure the lpass CLI is logged in.
+     Check with `lpass status` if we're logged in. If not, log in."
+       (interactive)
+
+       (let ((lpass-status (shell-command-to-string "lpass status --color=never"))) 
+
+	 (when (string-match-p (regexp-quote "Logged in as") lpass-status)
+	   (message "Lastpass was already logged in"))
+
+	 (when (string-match-p (regexp-quote "Not logged in.") lpass-status)
+
+	   (when (get-process "lastpass")	; Kill any previous stalled login attempt
+	     (delete-process "lastpass"))
+
+	   ;; Start trying to log in
+	   (let* ((username (read-string "Who should we log in as? "))
+		  (process (start-process-shell-command 
+			    "lastpass"
+			    nil
+			    (concat "LPASS_DISABLE_PINENTRY=1 lpass login "
+				    (shell-quote-argument username)))))
+	     (set-process-filter
+	      process
+	      ;; Respond to password and 2fa challenges
+	      (lambda (proc string)
+		(when (string-match-p (regexp-quote "Master Password") string)
+		  (process-send-string proc
+				       (concat (read-passwd "Lastpass Master Password? ") "\n")))
+		(when (string-match-p (regexp-quote "Code") string)
+		  (process-send-string proc
+				       (concat (read-passwd "2FA Code? ") "\n")))
+		(when (string-match-p (regexp-quote "Success") string)
+		  (message "Lastpass logged in"))))))))
+
+     (defun gds-lastpass-logout ()
+       "Ensure the lpass CLI is logged out."
+       (interactive)
+
+       (shell-command "lpass logout -f")
+       (message "Lastpass logged out"))
+   #+END_SRC
+
+*** TODO Known issue -- 2fa push notifications
+    Note that if you use a push notification like the lastpass
+    authenticator, then you have the option to *either* enter a 6
+    digit 2fa code through emacs, *or* respond to the push
+    notification on your mobile device. Since emacs doesn't know which
+    one you're going to choose, you get the =2FA Code?= prompt, even
+    if you never intend to use it.
+
+    I'd like to make that prompt automatically go away as soon as
+    lastpass reports it's logged in. It's not immediately obvious to
+    me how to do that though, so I'm leaving it for now. The ugly
+    workaround is to hit =C-g= to kill the stale prompt once you've
+    logged in.
+
+    I note that the [[https://melpa.org/#/lastpass][lastpass module on melpa]] avoids this issue by
+    asking the user to pre-declare what kind of 2FA (if any) they'll
+    use. Maybe I'll go that way -- we'll see.
+
+** SSH Keys
+   A lot of the things I work on are stored in github repos. While
+   emacs can manage local clones of those repos out-of-the-box, if I
+   want to be able to push, I'll need to load my creds.
+
+   Let's assume that our github private ssh key is stored in lastpass
+   in the folder =Personal/github-ssh-key=.
+
+   #+BEGIN_SRC emacs-lisp
+     (defun gds-load-github-keys ()
+       "Load my github keys from lastpass.
+     Ensure I'm logged in to lastpass. Then load my github keys from
+     Personal/github-ssh-key for one hour."
+       (interactive)
+
+       (gds-lastpass-ensure-logged-in)
+
+       (let ((key) (shell-command-to-string
+		    "lpass show Personal/github-ssh-key --notes"))
+
+	 (when (get-process "ssh-add-github") ; Kill any previous stalled ssh-add attempt
+	   (delete-process "ssh-add-github"))
+
+	 (let ((process (start-process-shell-command
+			 "ssh-add-github"
+			 nil
+			 (concat "ssh-add -t 15 <(echo " (shell-quote-argument key) ")"))))
+
+	   (set-process-filter
+	    process
+	    (lambda (proc string)
+	      (when (string-match-p (regexp-quote "Enter passphrase for") string)
+		(process-send-string proc
+				     (concat (read-passwd "Key passphrase? ") "\n"))))))))
+
+
+   #+END_SRC
+
+** Slack
+
+   It'd be great to use the [[https://github.com/yuya373/emacs-slack][slack package]] to connect to [[https://slack.com][slack]]. 
+
+*** TODO Get slack creds into lastpass, and make that work
+
+** Email
+
+   I've historically liked [[http://gnus.org/][gnus]] for email, news, and RSS.
+
+*** TODO See if gnus makes sense with my current gmail setup
+
+*** TODO See if gnus can play nice with my lastpass setup
