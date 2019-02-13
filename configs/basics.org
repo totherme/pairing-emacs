@@ -284,6 +284,14 @@
     (setq org-export-backends (list 'ascii 'html 'icalendar 'latex 'md 'beamer 'odt))
   #+END_SRC
 
+  One of the helpful things in org-mode is its ability to [[https://orgmode.org/manual/Hyperlinks.html#Hyperlinks][hyperlink]]
+  between lots of different types of things. I find it useful to have
+  a global binding for ~org-store-link~, as suggested [[https://orgmode.org/manual/Handling-links.html][in the manual]].
+
+  #+BEGIN_SRC emacs-lisp
+    (global-set-key (kbd "C-c l") 'org-store-link)
+  #+END_SRC
+
 * Footnotes
 
 [fn:1] If there are only two windows open, avy will skip the
