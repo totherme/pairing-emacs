@@ -323,6 +323,16 @@
     (global-set-key (kbd "C-c l") 'org-store-link)
   #+END_SRC
 
+* TODO Emacs Server
+
+  I'd like to be able to start start the [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Emacs-Server.html][emacs server]] iff it's not
+  already running somewhere.  That way, folks who understand/like it
+  will be able to edit files at the commandline in our existing emacs,
+  using [[https://www.emacswiki.org/emacs/EmacsClient][emacsclient]], and folks who're new to emacs can ignore it, and
+  type =emacs= at their con as many times as they like without getting
+  weird error messages.
+
+
 * Footnotes
 
 [fn:1] If there are only two windows open, avy will skip the
