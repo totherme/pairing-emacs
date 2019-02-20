@@ -85,11 +85,12 @@
    in the folder =Personal/github-ssh-key=.
 
    #+BEGIN_SRC emacs-lisp
-     (defun gds-load-github-keys ()
+     (defun gds-load-github-keys (hours)
        "Load my github keys from lastpass.
+
      Ensure I'm logged in to lastpass. Then load my github keys from
-     Personal/github-ssh-key for one hour."
-       (interactive)
+     Personal/github-ssh-key for one HOURS hours."
+       (interactive "nHow long for? ")
 
        (gds-lastpass-ensure-logged-in-and-then
 	(lambda ()
@@ -109,7 +110,10 @@
 	    (let ((process (start-process-shell-command
 			    "ssh-add-github"
 			    nil
-			    (concat "ssh-add -t 3600 " keyfile ))))
+			    (concat "ssh-add -t "
+				    (number-to-string (* 3600 hours))
+				    " "
+				    keyfile ))))
 
 	      (set-process-filter
 	       process
@@ -122,10 +126,9 @@
 		   (message "SSH Key successfully loaded")))))))))
    #+END_SRC
 
-*** TODO More varied key times than just one hour
-    Right now we just load keys for an hour at a time. It'd be nice to
-    have the option to load them until 6pm, for a standard working
-    day.
+*** TODO Load keys until 6pm?
+    It'd be nice to have the option to load keys until 6pm, for a
+    standard working day.
 ** Slack
 
    It'd be great to use the [[https://github.com/yuya373/emacs-slack][slack package]] to connect to [[https://slack.com][slack]]. 
