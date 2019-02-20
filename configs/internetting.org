@@ -20,15 +20,19 @@
    the =lpass= CLI is in the ~$PATH~.
 
    #+BEGIN_SRC emacs-lisp
-     (defun gds-lastpass-ensure-logged-in ()
-       "Ensure the lpass CLI is logged in.
-     Check with `lpass status` if we're logged in. If not, log in."
-       (interactive)
+     ;;; -*- lexical-binding: t -*-
+
+     (defun gds-lastpass-ensure-logged-in-and-then (continuation)
+       "Ensure the lpass CLI is logged in, then call CONTINUATION.
+
+     Check with `lpass status` if we're logged in. If not, log
+     in. Once we're logged in, call CONTINUATION."
 
        (let ((lpass-status (shell-command-to-string "lpass status --color=never"))) 
 
 	 (when (string-match-p (regexp-quote "Logged in as") lpass-status)
-	   (message "Lastpass was already logged in"))
+	   (message "Lastpass was already logged in")
+	   (funcall continuation))
 
 	 (when (string-match-p (regexp-quote "Not logged in.") lpass-status)
 
@@ -36,7 +40,7 @@
 	     (delete-process "lastpass"))
 
 	   ;; Start trying to log in
-	   (let* ((username (read-string "Who should we log in as? "))
+	   (let* ((username (read-string "Who should we log in to lastpass as? "))
 		  (process (start-process-shell-command 
 			    "lastpass"
 			    nil
@@ -50,10 +54,19 @@
 		  (process-send-string proc
 				       (concat (read-passwd "Lastpass Master Password? ") "\n")))
 		(when (string-match-p (regexp-quote "Code") string)
-		  (process-send-string proc
-				       (concat (read-passwd "2FA Code? ") "\n")))
+		  (unless (string-match-p (regexp-quote "out-of-band") string)
+		    (process-send-string proc
+					 (concat (read-passwd "2FA Code? ") "\n"))))
 		(when (string-match-p (regexp-quote "Success") string)
-		  (message "Lastpass logged in"))))))))
+		  (message "Lastpass logged in")
+		  (funcall continuation)))))))) ; This needs lexical binding
+
+     (defun gds-lastpass-login ()
+       "Ensure the lpass CLI is logged in.
+
+     Check with `lpass status` if we're logged in. If not, log in."
+       (interactive)
+       (gds-lastpass-ensure-logged-in-and-then (lambda ())))
 
      (defun gds-lastpass-logout ()
        "Ensure the lpass CLI is logged out."
@@ -62,26 +75,6 @@
        (shell-command "lpass logout -f")
        (message "Lastpass logged out"))
    #+END_SRC
-
-*** TODO Bug -- ~gds-ensure-lastpass-logged-in~ returns before its async process has logged in :(
-    
-*** TODO Known issue -- 2fa push notifications
-    Note that if you use a push notification like the lastpass
-    authenticator, then you have the option to *either* enter a 6
-    digit 2fa code through emacs, *or* respond to the push
-    notification on your mobile device. Since emacs doesn't know which
-    one you're going to choose, you get the =2FA Code?= prompt, even
-    if you never intend to use it.
-
-    I'd like to make that prompt automatically go away as soon as
-    lastpass reports it's logged in. It's not immediately obvious to
-    me how to do that though, so I'm leaving it for now. The ugly
-    workaround is to hit =C-g= to kill the stale prompt once you've
-    logged in.
-
-    I note that the [[https://melpa.org/#/lastpass][lastpass module on melpa]] avoids this issue by
-    asking the user to pre-declare what kind of 2FA (if any) they'll
-    use. Maybe I'll go that way -- we'll see.
 
 ** SSH Keys
    A lot of the things I work on are stored in github repos. While
@@ -98,50 +91,51 @@
      Personal/github-ssh-key for one hour."
        (interactive)
 
-       (gds-lastpass-ensure-logged-in)
+       (gds-lastpass-ensure-logged-in-and-then
+	(lambda ()
+	  ;; If this function has previously hung, there might be stuff to clean up.
+	  (when (and (boundp 'gds-temp-keyfile) (file-exists-p gds-temp-keyfile))
+	    (delete-file gds-temp-keyfile))
 
-       ;; If this function has previously hung, there might be stuff to clean up.
-       (when (and (boundp 'gds-temp-keyfile) (file-exists-p gds-temp-keyfile))
-	 (delete-file gds-temp-keyfile))
-
-       (defvar gds-temp-keyfile (make-temp-file "gdskeyfile")
-	 "The path to a temporary file for storing an SSH key. 
+	  (defvar gds-temp-keyfile (make-temp-file "gdskeyfile")
+	    "The path to a temporary file for storing an SSH key. 
 
 	  Needed so we can delete that file as soon as we're done with it.
 
 	 This should really be a lexically bound local variable, but gds
 	 hasn't figured out how to do that in org-mode yet.")
 
-       (with-temp-file gds-temp-keyfile)
-       (set-file-modes gds-temp-keyfile #o0600)
-       (with-temp-file gds-temp-keyfile
-	 (insert (shell-command-to-string
-		  "lpass show Personal/github-ssh-key --notes")))
+	  (with-temp-file gds-temp-keyfile)
+	  (set-file-modes gds-temp-keyfile #o0600)
+	  (with-temp-file gds-temp-keyfile
+	    (insert (shell-command-to-string
+		     "lpass show Personal/github-ssh-key --notes")))
 
+	  (when (get-process "ssh-add-github") ; Kill any previous stalled ssh-add attempt
+	    (delete-process "ssh-add-github"))
 
-       (when (get-process "ssh-add-github") ; Kill any previous stalled ssh-add attempt
-	 (delete-process "ssh-add-github"))
+	  (message "starting ssh-add process")
+	  (let ((process (start-process-shell-command
+			  "ssh-add-github"
+			  nil
+			  (concat "ssh-add -t 3600 " gds-temp-keyfile ))))
 
-       (let ((process (start-process-shell-command
-		       "ssh-add-github"
-		       nil
-		       (concat "ssh-add -t 3600 " gds-temp-keyfile ))))
-
-	 (set-process-filter
-	  process
-	  (lambda (proc string)
-	    (when (string-match-p (regexp-quote "Enter passphrase for") string)
-	      (process-send-string proc
-				   (concat (read-passwd "Key passphrase? ") "\n")))
-	    (when (string-match-p (regexp-quote "Identity added") string)
-	      (delete-file gds-temp-keyfile)
-	      (message "SSH Key successfully loaded"))))))
+	    (set-process-filter
+	     process
+	     (lambda (proc string)
+	       (when (string-match-p (regexp-quote "Enter passphrase for") string)
+		 (process-send-string proc
+				      (concat (read-passwd "Key passphrase? ") "\n")))
+	       (when (string-match-p (regexp-quote "Identity added") string)
+		 (delete-file gds-temp-keyfile)
+		 (message "SSH Key successfully loaded"))))))))
    #+END_SRC
 
 *** TODO Known issue -- Leaky temporary file name
-    Because I hadn't yet figured out how to use lexical variables in
-    org-tangled emacs-lisp files, I'm using a global variable to store
-    a temporary file name. This is at best ugly.
+    Because +I hadn't yet figured out how to use lexical variables in+
+    +org-tangled emacs-lisp files+ I haven't got around to using
+    lexical variables here yet, I'm using a global variable to store a
+    temporary file name. This is at best ugly.
 
 *** TODO More varied key times than just one hour
     Right now we just load keys for an hour at a time. It'd be nice to
