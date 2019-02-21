@@ -5,84 +5,27 @@
   else), emacs can be used to read email, and do various other
   internettey things.
 
-** Lastpass
-
-   Of course in order to do anything on the internet, we'll need
-   credentials. And storing those in a config file in git would be
-   unwise. Let's keep them in lastpass!
-
-   Unhappily, as I write this, the [[https://melpa.org/#/lastpass][lastpass module on melpa]] hasn't
-   been updated in over a year, and doesn't seem to work with the
-   latest CLI. So we'll have to roll our own for the tiny things we
-   want.
-
-   The bare minimum is to be able to log in and out. Let's assume that
-   the =lpass= CLI is in the ~$PATH~.
-
-   #+BEGIN_SRC emacs-lisp
-     ;;; -*- lexical-binding: t -*-
-
-     (defun gds-lastpass-ensure-logged-in-and-then (continuation)
-       "Ensure the lpass CLI is logged in, then call CONTINUATION.
-
-     Check with `lpass status` if we're logged in. If not, log
-     in. Once we're logged in, call CONTINUATION."
-
-       (let ((lpass-status (shell-command-to-string "lpass status --color=never"))) 
-
-	 (when (string-match-p (regexp-quote "Logged in as") lpass-status)
-	   (message "Lastpass was already logged in")
-	   (funcall continuation))
-
-	 (when (string-match-p (regexp-quote "Not logged in.") lpass-status)
-
-	   (when (get-process "lastpass")	; Kill any previous stalled login attempt
-	     (delete-process "lastpass"))
-
-	   ;; Start trying to log in
-	   (let* ((username (read-string "Who should we log in to lastpass as? "))
-		  (process (start-process-shell-command 
-			    "lastpass"
-			    nil
-			    (concat "LPASS_DISABLE_PINENTRY=1 lpass login "
-				    (shell-quote-argument username)))))
-	     (set-process-filter
-	      process
-	      ;; Respond to password and 2fa challenges
-	      (lambda (proc string)
-		(when (string-match-p (regexp-quote "Master Password") string)
-		  (process-send-string proc
-				       (concat (read-passwd "Lastpass Master Password? ") "\n")))
-		(when (string-match-p (regexp-quote "Code") string)
-		  (unless (string-match-p (regexp-quote "out-of-band") string)
-		    (process-send-string proc
-					 (concat (read-passwd "2FA Code? ") "\n"))))
-		(when (string-match-p (regexp-quote "Success") string)
-		  (message "Lastpass logged in")
-		  (funcall continuation)))))))) ; This needs lexical binding
-
-     (defun gds-lastpass-login ()
-       "Ensure the lpass CLI is logged in.
-
-     Check with `lpass status` if we're logged in. If not, log in."
-       (interactive)
-       (gds-lastpass-ensure-logged-in-and-then (lambda ())))
-
-     (defun gds-lastpass-logout ()
-       "Ensure the lpass CLI is logged out."
-       (interactive)
-
-       (shell-command "lpass logout -f")
-       (message "Lastpass logged out"))
-   #+END_SRC
+  Right now, the main thing I've set up is loading github keys from
+  lastpass. You can do this with ~M-x gds-load-github-keys~. You can
+  read about [[*SSH Keys][how it works, and the prerequisites below]].
 
 ** SSH Keys
    A lot of the things I work on are stored in github repos. While
    emacs can manage local clones of those repos out-of-the-box, if I
    want to be able to push, I'll need to load my creds.
 
-   Let's assume that our github private ssh key is stored in lastpass
-   in the folder =Personal/github-ssh-key=.
+   To make this possible, I've already stored a private SSH key (with
+   a sensible passphrase) as a lastpass note in the location
+   =Personal/github-ssh-key=.
+
+   This also makes use of our [[*Lastpass][lastpass functions]], and hence requires
+   that you already have the [[https://github.com/lastpass/lastpass-cli][=lpass= CLI]] installed.
+
+   To load your keys until 6pm (which, for me, is the end of the
+   working day), do =M-x gds-load-github-keys=. If it's after 6pm, or
+   you just want to load keys for a different amount of time, do =M-x
+   gds-load-github-keys-for= and enter the number of hours of access
+   you want when prompted.
 
    #+BEGIN_SRC emacs-lisp
      (defun gds-load-github-keys-for-seconds (seconds)
@@ -152,6 +95,77 @@
 	     (error "Looks like 6pm has been and gone")
 	   (let ((timeleft (time-subtract eod now)))
 	     (gds-load-github-keys-for-seconds (time-to-seconds timeleft))))))
+   #+END_SRC
+
+** Lastpass
+
+   Of course in order to do anything on the internet, we'll need
+   credentials. And storing those in a config file in git would be
+   unwise. Let's keep them in lastpass!
+
+   Unhappily, as I write this, the [[https://melpa.org/#/lastpass][lastpass module on melpa]] hasn't
+   been updated in over a year, and doesn't seem to work with the
+   latest CLI. So we'll have to roll our own for the tiny things we
+   want.
+
+   The bare minimum is to be able to log in and out. Let's assume that
+   the =lpass= CLI is in the ~$PATH~.
+
+   #+BEGIN_SRC emacs-lisp
+     ;;; -*- lexical-binding: t -*-
+
+     (defun gds-lastpass-ensure-logged-in-and-then (continuation)
+       "Ensure the lpass CLI is logged in, then call CONTINUATION.
+
+     Check with `lpass status` if we're logged in. If not, log
+     in. Once we're logged in, call CONTINUATION."
+
+       (let ((lpass-status (shell-command-to-string "lpass status --color=never"))) 
+
+	 (when (string-match-p (regexp-quote "Logged in as") lpass-status)
+	   (message "Lastpass was already logged in")
+	   (funcall continuation))
+
+	 (when (string-match-p (regexp-quote "Not logged in.") lpass-status)
+
+	   (when (get-process "lastpass")	; Kill any previous stalled login attempt
+	     (delete-process "lastpass"))
+
+	   ;; Start trying to log in
+	   (let* ((username (read-string "Who should we log in to lastpass as? "))
+		  (process (start-process-shell-command 
+			    "lastpass"
+			    nil
+			    (concat "LPASS_DISABLE_PINENTRY=1 lpass login "
+				    (shell-quote-argument username)))))
+	     (set-process-filter
+	      process
+	      ;; Respond to password and 2fa challenges
+	      (lambda (proc string)
+		(when (string-match-p (regexp-quote "Master Password") string)
+		  (process-send-string proc
+				       (concat (read-passwd "Lastpass Master Password? ") "\n")))
+		(when (string-match-p (regexp-quote "Code") string)
+		  (unless (string-match-p (regexp-quote "out-of-band") string)
+		    (process-send-string proc
+					 (concat (read-passwd "2FA Code? ") "\n"))))
+		(when (string-match-p (regexp-quote "Success") string)
+		  (message "Lastpass logged in")
+		  (funcall continuation)))))))) ; This needs lexical binding
+
+     (defun gds-lastpass-login ()
+       "Ensure the lpass CLI is logged in.
+
+     Check with `lpass status` if we're logged in. If not, log in."
+       (interactive)
+       (gds-lastpass-ensure-logged-in-and-then (lambda ())))
+
+     (defun gds-lastpass-logout ()
+       "Ensure the lpass CLI is logged out."
+       (interactive)
+
+       (shell-command "lpass logout -f")
+       (message "Lastpass logged out"))
    #+END_SRC
 
 ** Slack
