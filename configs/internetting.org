@@ -85,12 +85,11 @@
    in the folder =Personal/github-ssh-key=.
 
    #+BEGIN_SRC emacs-lisp
-     (defun gds-load-github-keys (hours)
-       "Load my github keys from lastpass.
+     (defun gds-load-github-keys-for-seconds (seconds)
+       "Load my github keys from lastpass for SECONDS seconds.
 
      Ensure I'm logged in to lastpass. Then load my github keys from
-     Personal/github-ssh-key for one HOURS hours."
-       (interactive "nHow long for? ")
+     Personal/github-ssh-key for one SECONDS seconds."
 
        (gds-lastpass-ensure-logged-in-and-then
 	(lambda ()
@@ -106,14 +105,10 @@
 	    (when (get-process "ssh-add-github") ; Kill any previous stalled ssh-add attempt
 	      (delete-process "ssh-add-github"))
 
-	    (message "starting ssh-add process")
 	    (let ((process (start-process-shell-command
 			    "ssh-add-github"
 			    nil
-			    (concat "ssh-add -t "
-				    (number-to-string (* 3600 hours))
-				    " "
-				    keyfile ))))
+			    (format "ssh-add -t %d %s" seconds keyfile))))
 
 	      (set-process-filter
 	       process
@@ -124,11 +119,41 @@
 		 (when (string-match-p (regexp-quote "Identity added") string)
 		   (delete-file keyfile)
 		   (message "SSH Key successfully loaded")))))))))
+
+     (defun gds-load-github-keys-for (hours)
+	 "Load my github keys from lastpass for HOURS hours.
+
+     Use `gds-load-github-keys-for-seconds' to load keys from
+     lastpass"
+	   (interactive "nHow long for? ")
+	   (gds-load-github-keys-for-seconds (* 3600 hours)))
+
+     (defun gds-load-github-keys ()
+       "Load my github keys from lastpass until 6pm.
+
+     Calculate how long it'll be until 6pm, then use
+     `gds-load-github-keys-for-seconds' to load my keys until then."
+       (interactive)
+
+       (let* ((now (current-time))
+	      (now-decoded (decode-time now))
+	      (eod (encode-time (list
+				 0			;Seconds
+				 0			;Minutes
+				 18			;Hours
+				 (nth 3 now-decoded)	;Day
+				 (nth 4 now-decoded)	;Month
+				 (nth 5 now-decoded)	;Year
+				 (nth 6 now-decoded)	;DOW -- Ignored by encode but whatevs.
+				 (nth 7 now-decoded)	;DST
+				 (nth 8 now-decoded)	;Zone (UTC offset)
+				 ))))
+	 (if (time-less-p eod now)
+	     (error "Looks like 6pm has been and gone")
+	   (let ((timeleft (time-subtract eod now)))
+	     (gds-load-github-keys-for-seconds (time-to-seconds timeleft))))))
    #+END_SRC
 
-*** TODO Load keys until 6pm?
-    It'd be nice to have the option to load keys until 6pm, for a
-    standard working day.
 ** Slack
 
    It'd be great to use the [[https://github.com/yuya373/emacs-slack][slack package]] to connect to [[https://slack.com][slack]]. 
