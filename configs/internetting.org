@@ -19,7 +19,7 @@
    =Personal/github-ssh-key=.
 
    This also makes use of our [[*Lastpass][lastpass functions]], and hence requires
-   that you already have the [[https://github.com/lastpass/lastpass-cli][=lpass= CLI]] installed.
+   that you already have the [[https://github.com/lastpass/lastpass-cli][lpass CLI]] installed.
 
    To load your keys until 6pm (which, for me, is the end of the
    working day), do =M-x gds-load-github-keys=. If it's after 6pm, or
