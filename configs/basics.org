@@ -308,20 +308,31 @@
 
 * Org-mode config
   
-  By default, org-mode will only export to ascii, html, icalendar, and
-  latex. We can enable markdown, beamer and odt support.
+** Export to more formats
+   By default, org-mode will only export to ascii, html, icalendar, and
+   latex. We can enable markdown, beamer and odt support.
 
-  #+BEGIN_SRC emacs-lisp
-    (setq org-export-backends (list 'ascii 'html 'icalendar 'latex 'md 'beamer 'odt))
-  #+END_SRC
+   #+BEGIN_SRC emacs-lisp
+     (setq org-export-backends (list 'ascii 'html 'icalendar 'latex 'md 'beamer 'odt))
+   #+END_SRC
 
-  One of the helpful things in org-mode is its ability to [[https://orgmode.org/manual/Hyperlinks.html#Hyperlinks][hyperlink]]
-  between lots of different types of things. I find it useful to have
-  a global binding for ~org-store-link~, as suggested [[https://orgmode.org/manual/Handling-links.html][in the manual]].
+** Hyperlink to anything
+   One of the helpful things in org-mode is its ability to [[https://orgmode.org/manual/Hyperlinks.html#Hyperlinks][hyperlink]]
+   between lots of different types of things. I find it useful to have
+   a global binding for ~org-store-link~, as suggested [[https://orgmode.org/manual/Handling-links.html][in the manual]].
 
-  #+BEGIN_SRC emacs-lisp
-    (global-set-key (kbd "C-c l") 'org-store-link)
-  #+END_SRC
+   #+BEGIN_SRC emacs-lisp
+     (global-set-key (kbd "C-c l") 'org-store-link)
+   #+END_SRC
+
+** Enable time tracking
+   Org-mode also has a handy [[https://orgmode.org/manual/Clocking-work-time.html][time-tracking feature]], which you can use
+   to keep track of how long you spend working on different tasks.
+
+   #+BEGIN_SRC emacs-lisp
+     (setq org-clock-persist 'history)
+     (org-clock-persistence-insinuate)
+   #+END_SRC
 
 * TODO Emacs Server
 
