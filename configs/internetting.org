@@ -9,6 +9,13 @@
   lastpass. You can do this with ~M-x gds-load-github-keys~. You can
   read about [[*SSH Keys][how it works, and the prerequisites below]].
 
+** Lexical Binding
+   A lot of the elisp in this file requires lexical binding. We should
+   enable it up front, before getting into the meat of things.
+   #+BEGIN_SRC emacs-lisp
+     ;;; -*- lexical-binding: t -*-
+   #+END_SRC
+
 ** SSH Keys
    A lot of the things I work on are stored in github repos. While
    emacs can manage local clones of those repos out-of-the-box, if I
@@ -112,8 +119,6 @@
    the =lpass= CLI is in the ~$PATH~.
 
    #+BEGIN_SRC emacs-lisp
-     ;;; -*- lexical-binding: t -*-
-
      (defun gds-lastpass-ensure-logged-in-and-then (continuation)
        "Ensure the lpass CLI is logged in, then call CONTINUATION.
 
