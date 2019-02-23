@@ -180,13 +180,6 @@
 	(format "lpass show %s --notes" note-path)))
    #+END_SRC
 
-   
-*** TODO Make using callbacks nicer
-    At the moment when I use ~gds-lastpass-ensure-logged-in-and-then~,
-    I have to explicitly wrap the callback in a ~lambda~. It might be
-    prettier to not have to do this -- to make it a form more like
-    ~if~. This might mean writing a macro...?
-
 ** Slack
 
    If you want to use [[https://slack.com][slack]] in emacs, this will do the trick. The code
