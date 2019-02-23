@@ -49,8 +49,7 @@
 	    (with-temp-file keyfile)
 	    (set-file-modes keyfile #o0600)
 	    (with-temp-file keyfile
-	      (insert (shell-command-to-string
-		       "lpass show Personal/github-ssh-key --notes")))
+	      (insert (gds-lastpass-get-note "Personal/github-ssh-key")))
 
 	    (when (get-process "ssh-add-github") ; Kill any previous stalled ssh-add attempt
 	      (delete-process "ssh-add-github"))
@@ -171,13 +170,93 @@
 
        (shell-command "lpass logout -f")
        (message "Lastpass logged out"))
+
+     (defun gds-lastpass-get-note (note-path)
+       "Get a secure note from lastpass.
+
+     We must already be logged in to lastpass for this to work. Use
+     `gds-lastpass-ensure-logged-in-and-then' to be sure."
+       (shell-command-to-string
+	(format "lpass show %s --notes" note-path)))
    #+END_SRC
+
+   
+*** TODO Make using callbacks nicer
+    At the moment when I use ~gds-lastpass-ensure-logged-in-and-then~,
+    I have to explicitly wrap the callback in a ~lambda~. It might be
+    prettier to not have to do this -- to make it a form more like
+    ~if~. This might mean writing a macro...?
 
 ** Slack
 
-   It'd be great to use the [[https://github.com/yuya373/emacs-slack][slack package]] to connect to [[https://slack.com][slack]]. 
+   If you want to use [[https://slack.com][slack]] in emacs, this will do the trick. The code
+   below downloads and configures the [[https://github.com/yuya373/emacs-slack][slack package]] by Yuya Minami. In
+   order for this configuration to work, we need credentials. And of
+   course, all credentials should be stored in lastpass.
 
-*** TODO Get slack creds into lastpass, and make that work
+   Create a lastpass entry at location =Personal/slack-creds=, and put
+   the following JSON in there:
+
+   #+BEGIN_SRC json
+   [{ "name": "emacs-slack",
+   "id": "aaaaaaaaaaa.00000000000",
+   "secret": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+   "token": "xoxs-sssssssssss-88888888888-hhhhhhhhhhh-jjjjjjjjjj"}]
+   #+END_SRC
+
+   ...and edit that json to connect to the slack workspace you're
+   interested in (which may or may not be the [[https://emacs.slack.com/][emacs slack]]), and to use
+   your own ID, secret, and token. Unfortunately you can't use use
+   OAuth or give it your regular password, so getting those
+   credentials is a little involved. [[https://github.com/yuya373/emacs-slack#how-to-get-token-the-easy-way][Read how here]].
+
+   Once your creds are in lastpass, emacs-slack should [[https://github.com/yuya373/emacs-slack/wiki/ScreenShots][work as advertised]].
+
+   #+BEGIN_SRC emacs-lisp
+     (use-package slack
+       :ensure t
+       :commands (slack-start)
+       :init
+       (setq slack-buffer-emojify t)
+       (setq slack-prefer-current-team t)
+       :config
+       (gds-lastpass-ensure-logged-in-and-then
+	(lambda ()
+	  (let* ((creds (json-read-from-string (gds-lastpass-get-note "Personal/slack-creds"))))
+	    (map-do
+	     (lambda (n team)
+	       (slack-register-team
+		:name (alist-get 'name team)
+		:default t
+		:client-id (alist-get 'id team)
+		:client-secret (alist-get 'secret team)
+		:token (alist-get 'token team)
+		:subscribed-channels '()
+		:full-and-display-names t))
+	     creds)))))
+   #+END_SRC
+
+*** TODO BUG: the config runs /slightly/ too late
+    When I run =M-x slack-start= for the first time, the package
+    loads, the slack command starts running, and only then does the
+    config start running. This means that we get simultaneously asked
+    for a slack team name (because slack doesn't have out config from
+    lastpass yet) and for a lastpass password. We have to abort the
+    first slack login, go through the lastpass business, and then
+    re-start the slack command.
+
+    Possibly the easiest fix is to add the config as advice around the
+    ~slack-start~ command? We'd want it to run only once per session,
+    but it can presumably check if a slack team has been registered
+    yet to do that.
+
+*** TODO Should I add a subscribed channel list to lastpass?
+    I think this would mean we get alerts for non-mentions in all
+    channels in that list. I think the default is to get an alert for
+    mentions, and for "open channels".
+
+    It's probably also worth checking out this [[http://endlessparentheses.com/keep-your-slack-distractions-under-control-with-emacs.html][keeping distractions
+    under control]] blog before making decisions here.
 
 ** Email
 
