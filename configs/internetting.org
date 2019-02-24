@@ -187,23 +187,25 @@
    order for this configuration to work, we need credentials. And of
    course, all credentials should be stored in lastpass.
 
-   Create a lastpass entry at location =Personal/slack-creds=, and put
+   Create a lastpass Note at location =Personal/slack-creds=, and put
    the following JSON in there:
 
    #+BEGIN_SRC json
-   [{ "name": "emacs-slack",
+   [{ "name": "my-slack-workspace",
    "id": "aaaaaaaaaaa.00000000000",
    "secret": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
    "token": "xoxs-sssssssssss-88888888888-hhhhhhhhhhh-jjjjjjjjjj"}]
    #+END_SRC
 
    ...and edit that json to connect to the slack workspace you're
-   interested in (which may or may not be the [[https://emacs.slack.com/][emacs slack]]), and to use
-   your own ID, secret, and token. Unfortunately you can't use use
-   OAuth or give it your regular password, so getting those
-   credentials is a little involved. [[https://github.com/yuya373/emacs-slack#how-to-get-token-the-easy-way][Read how here]].
+   interested in, and to use your own ID, secret, and
+   token. Unfortunately you can't use use OAuth or give it your
+   regular password, so getting those credentials is a little
+   involved. [[https://github.com/yuya373/emacs-slack#how-to-get-token-the-easy-way][Read how here]].
 
-   Once your creds are in lastpass, emacs-slack should [[https://github.com/yuya373/emacs-slack/wiki/ScreenShots][work as advertised]].
+   Once your creds are in lastpass, you can configure and start
+   emacs-slack with =M-x gds-slack-configure-and-start=, and the rest
+   should [[https://github.com/yuya373/emacs-slack/wiki/ScreenShots][work as advertised]].
 
    #+BEGIN_SRC emacs-lisp
      (use-package slack
@@ -211,8 +213,15 @@
        :commands (slack-start)
        :init
        (setq slack-buffer-emojify t)
-       (setq slack-prefer-current-team t)
-       :config
+       (setq slack-prefer-current-team t))
+
+     (defun gds-slack-configure-and-start ()
+       "Configure slack from lastpass, and start it.
+
+     Assuming you have your slack creds in JSON format in lastpass,
+       this function will use those creds to configure your slack, and
+       will start it for you."
+       (interactive)
        (gds-lastpass-ensure-logged-in-and-then
 	(lambda ()
 	  (let* ((creds (json-read-from-string (gds-lastpass-get-note "Personal/slack-creds"))))
@@ -226,22 +235,9 @@
 		:token (alist-get 'token team)
 		:subscribed-channels '()
 		:full-and-display-names t))
-	     creds)))))
+	     creds))
+	  (slack-start))))
    #+END_SRC
-
-*** TODO BUG: the config runs /slightly/ too late
-    When I run =M-x slack-start= for the first time, the package
-    loads, the slack command starts running, and only then does the
-    config start running. This means that we get simultaneously asked
-    for a slack team name (because slack doesn't have out config from
-    lastpass yet) and for a lastpass password. We have to abort the
-    first slack login, go through the lastpass business, and then
-    re-start the slack command.
-
-    Possibly the easiest fix is to add the config as advice around the
-    ~slack-start~ command? We'd want it to run only once per session,
-    but it can presumably check if a slack team has been registered
-    yet to do that.
 
 *** TODO Should I add a subscribed channel list to lastpass?
     I think this would mean we get alerts for non-mentions in all
