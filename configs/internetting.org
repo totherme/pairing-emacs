@@ -187,7 +187,7 @@
    order for this configuration to work, we need credentials. And of
    course, all credentials should be stored in lastpass.
 
-   Create a lastpass Note at location =Personal/slack-creds=, and put
+   Create a lastpass =Note= at location =Personal/slack-creds=, and put
    the following JSON in there:
 
    #+BEGIN_SRC json
@@ -197,11 +197,15 @@
    "token": "xoxs-sssssssssss-88888888888-hhhhhhhhhhh-jjjjjjjjjj"}]
    #+END_SRC
 
-   ...and edit that json to connect to the slack workspace you're
+   Edit that json to connect to the slack workspace you're
    interested in, and to use your own ID, secret, and
    token. Unfortunately you can't use use OAuth or give it your
    regular password, so getting those credentials is a little
    involved. [[https://github.com/yuya373/emacs-slack#how-to-get-token-the-easy-way][Read how here]].
+
+   You might notice that the JSON you just created is a list of
+   objects. If you want to configure multiple slack workspaces, create
+   one object per workspace, and add them to your list.
 
    Once your creds are in lastpass, you can configure and start
    emacs-slack with =M-x gds-slack-configure-and-start=, and the rest
