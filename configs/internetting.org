@@ -316,7 +316,7 @@
 			   '(nnimap-stream ssl)))
 
 	    (setq smtpmail-smtp-server smtp-address
-		  smtpmail-smtp-service smtp-port	;gdsgds this might need to be a number not a string
+		  smtpmail-smtp-service smtp-port
 		  gnus-ignored-newsgroups "^to\\.\\|^[0-9. ]+\\( \\|$\\)\\|^[\"]\"[#'()]")
 
 	    ;; Now shim our secrets into the auth-source framework, so we
