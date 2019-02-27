@@ -253,8 +253,118 @@
 
 ** Email
 
-   I've historically liked [[http://gnus.org/][gnus]] for email, news, and RSS.
+   I like using [[http://gnus.org/][gnus]] for email. To make this work, we'll need some
+   credentials in lastpass. Create a lastpass =Note= at location
+   =Personal/email-creds=, and put the following JSON there:
 
-*** TODO See if gnus makes sense with my current gmail setup
+   #+BEGIN_SRC json
+     {
+	 "user-email-address": "me@where.ever.i.live",
+	 "user-full-name": "My Name",
+	 "email-provider-name": "Gmail or whatever",
+	 "imap-address": "imap.gmail.com or similar",
+	 "smtp-address": "smtp.gmail.com or similar",
+	 "smtp-port": "587 or similar",
+	 "username": "my-username",
+	 "password": "my-password"
+     }
+   #+END_SRC
 
-*** TODO See if gnus can play nice with my lastpass setup
+   If you're using gmail, you'll have to [[https://support.google.com/accounts/answer/185839?hl=en][enable 2 factor auth]], and
+   [[https://support.google.com/accounts/answer/185833?hl=en][create an app specific password]]. This is the password that you'll
+   need to put in your creds -- *not* your regular google password.
+
+   Once your configuration is safely in lastpass, run =M-x
+   gds-gnus-go= to read your mail.
+
+   Most of the following configuration is borrowed straight from the
+   [[https://www.emacswiki.org/emacs/GnusGmail][emacswiki page for making gmail work with gnus]]. The authinfo shim
+   is heavily informed by [[https://github.com/DamienCassou/auth-password-store/blob/master/auth-source-pass.el][Daimian Cassou's auth-password-store]].
+
+   #+BEGIN_SRC emacs-lisp
+     (defun gds-gnus-go ()
+       "Configure gnus from lastpass, then run it.
+
+     Use `gds-gnus-configure' to configure gnus using creds form
+     lastpass. Then run gnus."
+       (gds-gnus-configure)
+       (gnus))
+
+     (defun gds-gnus-configure ()
+       "Pull email creds from lastpass and configure gnus with them."
+       (interactive)
+       (gds-lastpass-ensure-logged-in-and-then
+	(lambda ()
+	  (let* ((creds (json-read-from-string (gds-lastpass-get-note "Personal/email-creds")))
+		 (mail-address (alist-get 'user-email-address creds))
+		 (full-name (alist-get 'user-full-name creds))
+		 (email-provider-name (alist-get 'email-provider-name creds))
+		 (imap-address (alist-get 'imap-address creds))
+		 (smtp-address (alist-get 'smtp-address creds))
+		 (smtp-port (alist-get 'smtp-port creds))
+		 (username (alist-get 'username creds))
+		 (password (alist-get 'password creds)))
+
+	    ;; First configure gnus with non-secrets
+	    (setq user-mail-address mail-address)
+	    (setq user-full-name full-name)
+
+	    (setq gnus-select-method
+		  (list 'nnimap email-provider-name
+			   (list 'nnimap-address imap-address)
+			   '(nnimap-server-port "imaps")
+			   '(nnimap-stream ssl)))
+
+	    (setq smtpmail-smtp-server smtp-address
+		  smtpmail-smtp-service smtp-port	;gdsgds this might need to be a number not a string
+		  gnus-ignored-newsgroups "^to\\.\\|^[0-9. ]+\\( \\|$\\)\\|^[\"]\"[#'()]")
+
+	    ;; Now shim our secrets into the auth-source framework, so we
+	    ;; don't have to manually type in our app-specific password.
+	    (cl-defun gds-gnus-auth-source-search (&rest spec
+							 &key backend type host user port
+							 &allow-other-keys)
+	      (let ((host-address (cadr host))) ; Gnus asks for passwords
+						; with host of the form
+						; (provider-name address)
+		(cond ((string= imap-address host-address)
+		       ;; IMAP Gmail Creds
+		       (list (list
+			      :host host-address
+			      :port "imaps"
+			      :user username
+			      :secret password)))
+		      ((string= smtp-address host-address)
+		       ;; SMTP Gmail Creds
+		       (list (list
+			      :host host-address
+			      :port smtp-port
+			      :user username
+			      :secret password))))))
+
+	    (defvar gds-gnus-auth-source-backend
+	      (auth-source-backend "gds-gnus"
+				   :source "." ;; not used
+				   :type 'gds-gnus
+				   :search-function #'gds-gnus-auth-source-search)
+	      "Auth-source backend variable for gds-gnus shim.")
+
+	    (add-to-list 'auth-sources 'gds-gnus)
+	    (auth-source-forget-all-cached))
+
+	  (defun gds-gnus-auth-source-backend-parse (entry)
+	    "Create auth-source backend from ENTRY."
+	    (when (eq entry 'gds-gnus)
+	      (auth-source-backend-parse-parameters entry gds-gnus-auth-source-backend)))
+
+	  ;; Advice to add custom auth-source function
+	  (if (boundp 'auth-source-backend-parser-functions)
+	      (add-hook 'auth-source-backend-parser-functions #'gds-gnus-auth-source-backend-parse)
+	    (advice-add 'auth-source-backend-parse :before-until #'gds-gnus-auth-source-backend-parse))
+
+	  (message "Gnus configured from lastpass"))))
+   #+END_SRC
+
+*** TODO Extract the auth-source shim business
+    All that stuff is pretty ugly in-line, and would be testable as a
+    library.
