@@ -345,6 +345,36 @@
 	    (funcall continuation))))
      #+END_SRC
 
+*** Open-in-gmail
+    Sometimes it's useful to be able to open the message you're
+    currently looking at in gmail. That way, you can create gmail
+    filters based on it, and that kind of thing.
+
+    #+BEGIN_SRC emacs-lisp
+      (defun gds-gnus-open-in-gmail ()
+	"Open the current article in gmail.
+
+	Extract the message-id from the article header, then construct a
+      gmail URL to find it."
+	(interactive)
+	(let* ((msg-header (gnus-summary-article-header))
+	       (msg-id (mail-header-id msg-header))
+	       (url-id (url-hexify-string (format "rfc822msgid:%s" msg-id)))
+	       (message-url (format "https://mail.google.com/mail/u/0/?ibxr=0#search/%s" url-id)))
+	  (browse-url message-url)))
+
+      (define-minor-mode gds-gnus-summary-mode
+	"Toggle gds-gnus-summary-mode
+
+      Gds-gnus-summary-mode adds gds's extra keyboard shortcuts to
+      gnus. Right now, that just means a function to open the current
+      message in gmail will be bound to C-c g."
+	:keymap (let ((map (make-sparse-keymap)))
+		  (define-key map (kbd "C-c g") #'gds-gnus-open-in-gmail)
+		  map))
+
+      (add-hook 'gnus-summary-mode-hook #'gds-gnus-summary-mode)
+    #+END_SRC
 *** TODO Extract the auth-source shim business
     All that stuff is pretty ugly in-line, and would be testable as a
     library.
