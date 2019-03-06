@@ -92,17 +92,24 @@
 
        (let* ((now (current-time))
 	      (now-decoded (decode-time now))
-	      (eod (encode-time (list
-				 0			;Seconds
-				 0			;Minutes
-				 18			;Hours
-				 (nth 3 now-decoded)	;Day
-				 (nth 4 now-decoded)	;Month
-				 (nth 5 now-decoded)	;Year
-				 (nth 6 now-decoded)	;DOW -- Ignored by encode but whatevs.
-				 (nth 7 now-decoded)	;DST
-				 (nth 8 now-decoded)	;Zone (UTC offset)
-				 ))))
+	      (eod (if (< emacs-major-version 27)
+		       (encode-time 0		    ;Seconds
+				    0		    ;Minutes
+				    18		    ;Hours
+				    (nth 3 now-decoded)  ;Day
+				    (nth 4 now-decoded)  ;Month
+				    (nth 5 now-decoded)) ;Year
+		     (encode-time (list
+				   0			  ;Seconds
+				   0			  ;Minutes
+				   18		  ;Hours
+				   (nth 3 now-decoded) ;Day
+				   (nth 4 now-decoded) ;Month
+				   (nth 5 now-decoded) ;Year
+				   (nth 6 now-decoded) ;DOW -- Ignored by encode but whatevs.
+				   (nth 7 now-decoded) ;DST
+				   (nth 8 now-decoded) ;Zone (UTC offset)
+				   )))))
 	 (if (time-less-p eod now)
 	     (error "Looks like 6pm has been and gone")
 	   (let ((timeleft (time-subtract eod now)))
