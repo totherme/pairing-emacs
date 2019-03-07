@@ -334,6 +334,112 @@
      (org-clock-persistence-insinuate)
    #+END_SRC
 
+** Task management
+   Org-mode works great as a task-management system. I like mine to
+   sync with trello, so I can use the same task lists in android as I
+   do on my laptop -- [[file:internetting.org::*Trello][that plumbing is here]].
+
+   I like to have six levels of task:
+   - things I want to do
+   - things I'm doing right now
+   - things I've done
+   - things I can't do, and it's not my fault
+   - things I might do later
+   - things I'm totally not doing
+
+   #+BEGIN_SRC emacs-lisp
+     (setq org-todo-keywords
+	   '((sequence "TODO(t!/!)" "DOING(g!/!)"
+		       "|"
+		       "DONE(d!/!)" "BLOCKED(b@/!)" "LATER(l!/!)" "NOTDOING(n@/!)")))
+     (setq org-log-into-drawer t)
+   #+END_SRC
+
+   Note that the =BLOCKED= and =NOTDOING= states have a funny =@= code
+   in them. This means that when I decide that I'm blocked on
+   something, I'll usually want to record what I'm blocked on. And
+   when I'm not doing something, I'll generally want to record
+   why. Those recordings should go into a drawer where I don't have to
+   look at them most of the time.
+   
+   When I finish a thing, I like to record when I finished it.
+   #+BEGIN_SRC emacs-lisp
+     (setq org-log-done 'time)
+   #+END_SRC
+
+*** Viewing and capturing tasks
+    Often a task will pop into existence while in the middle of
+    another task. That's what =org-capture= is for. If I'm reading an
+    email and realise that I need to do a thing about this email, I
+    hit =C-c c= and get an entry in my main org file.
+
+    If I want to see what jobs need doing, I can use my agenda. I hit
+    =C-c a= to get a generated list of things that need doing.
+
+    #+BEGIN_SRC emacs-lisp
+      (global-set-key (kbd "C-c c") 'org-capture)
+      (global-set-key (kbd "C-c a") 'org-agenda)
+    #+END_SRC
+   
+    For this to work, we need to actually have some todo lists. Since
+    I like mine to be in sync between org and trello, that bit of [[file:internetting.org::*Trello][the
+    plumbing is here]].
+
+    Because we're using org-trello, we need to capture all tasks as
+    top-level items (trello doesn't support trees). I like to capture
+    tasks as regular =TODO= items, or as items that might expire if I
+    don't get to them in time.
+
+    #+BEGIN_SRC emacs-lisp
+      (setq org-capture-templates
+	    '(
+	      ("t" "Todo" entry (file org-default-notes-file)
+	       "* TODO %? \n  %a\n  %K"
+	       )
+	      ("1" "Todo by tomorrow" entry (file org-default-notes-file)
+	       "* TODO %? \n  :PROPERTIES:\n  :EXPIRY:   [%(gds-tomorrow)]\n  :END:\n  %a\n  %K"
+	       )
+	      ("2" "Todo within a week" entry (file org-default-notes-file)
+	       "* TODO %? \n  :PROPERTIES:\n  :EXPIRY:   [%(gds-next-week)]\n  :END:\n  %a\n  %K"
+	       )
+	      ("3" "Todo within a fortnight" entry (file org-default-notes-file)
+	       "* TODO %? \n  :PROPERTIES:\n  :EXPIRY:   [%(gds-in-a-fortnight)]\n  :END:\n  %a\n  %K"
+	       )
+	      ("4" "Todo within a month" entry (file org-default-notes-file)
+	       "* TODO %? \n  :PROPERTIES:\n  :EXPIRY:   [%(gds-next-month)]\n  :END:\n  %a\n  %K"
+	       )
+	      ("5" "Todo within two months" entry (file org-default-notes-file)
+	       "* TODO %? \n  :PROPERTIES:\n  :EXPIRY:   [%(gds-in-two-months)]\n  :END:\n  %a\n  %K"
+	       )))
+
+      (defun gds-today ()
+	"Get today's date as a string."
+	(format-time-string "%F" (current-time)))
+
+      (defun gds-tomorrow ()
+	"Get tomorrow's date as a string."
+	(format-time-string "%F" (time-add (current-time) (days-to-time 1))))
+
+      (defun gds-next-week ()
+	"Get next week's date as a string."
+	(format-time-string "%F" (time-add (current-time) (days-to-time 7))))
+
+      (defun gds-in-a-fortnight ()
+	"Get next fortnight's date as a string."
+	(format-time-string "%F" (time-add (current-time) (days-to-time 14))))
+
+      (defun gds-next-month ()
+	"Get next month's date as a string."
+	(cl-destructuring-bind (sec min hour day month year dow dst zone)
+	    (decode-time (current-time))
+	  (format-time-string "%F" (encode-time 0 0 0 day (+ 1 month) year))))
+
+      (defun gds-in-two-months ()
+	"Get two month's date as a string."
+	(cl-destructuring-bind (sec min hour day month year dow dst zone)
+	    (decode-time (current-time))
+	  (format-time-string "%F" (encode-time 0 0 0 day (+ 2 month) year))))
+    #+END_SRC
 * TODO Emacs Server
 
   I'd like to be able to start start the [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Emacs-Server.html][emacs server]] iff it's not

@@ -446,15 +446,17 @@
 		 (token (alist-get 'token creds))
 		 (files (alist-get 'files creds)))
 	    (setq org-trello-files (map 'list #'identity files))
+	    (mapc (lambda (file)
+		    (setq org-default-notes-file file)
+		    (cl-pushnew file org-agenda-files))
+		  org-trello-files)
 
 	    ;; Shim our creds into all the interesting files, so org-trello
 	    ;; never tries to load the config file we deleted.
 	    (add-hook 'org-mode-hook
 		      (lambda ()
-			(message "gdsgds setting trello keys")
 			(setq org-trello-consumer-key key
-			      org-trello-access-token token)
-			(message "gdsgds trello keys set")))
+			      org-trello-access-token token)))
 
 	    (defun gds-orgtrello-load-keys-shim (&rest args)
 	      "We already loaded keys from lastpass, so just return :ok"
