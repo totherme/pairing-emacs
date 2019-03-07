@@ -305,6 +305,8 @@
 		    smtpmail-smtp-service smtp-port
 		    gnus-ignored-newsgroups "^to\\.\\|^[0-9. ]+\\( \\|$\\)\\|^[\"]\"[#'()]")
 
+	      (setq send-mail-function #'smtpmail-send-it)
+
 	      ;; Now shim our secrets into the auth-source framework, so we
 	      ;; don't have to manually type in our app-specific password.
 	      (cl-defun gds-gnus-auth-source-search (&rest spec

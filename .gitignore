@@ -13,3 +13,4 @@ var
 /emojis/
 /org-clock-save.el
 /network-security.data
+/session.*
