@@ -11,6 +11,7 @@
       gds-load-github-keys~.
   - [[*Slack][Slack]]
   - [[*Email][Email]]
+  - [[*Trello][Trello]]
 
   For details on how those things work, and what lastpass entries you
   need to create in order to make them work for you, see below.
@@ -387,6 +388,84 @@
 *** TODO Extract the auth-source shim business
     All that stuff is pretty ugly in-line, and would be testable as a
     library.
+** Trello
+   I'd like to be able to use org-mode for tracking my todo lists
+   while I'm on a laptop, but also be able to access them on my phone,
+   and collaborate with other people on them.
+
+   Again, we'll need to store some credentials in lastpass, and those
+   credentials won't be a standard username and password. They'll be
+   Oauth tokens. In this case =org-trello= offers us some helper
+   functions to get them. Do =M-x org-trello-install-key-and-token=
+   and follow [[https://org-trello.github.io/trello-setup.html][the instructions here]].
+
+   This will result in a file appearing in
+   =~/.emacs.d/.trello/$TRELLO_USERNAME.el=. That file will contain
+   the credentials you need to connect to trello, so we won't want to
+   leave it lying around forever. We'll copy those creds into
+   lastpass, then delete that file.
+
+   In lastpass, we'll need our creds, and also the list of files that
+   we intend to use with trello. Save this note in
+   =Personal/trello-creds=.
+
+   #+BEGIN_SRC json
+     {
+	 "key": "the org-trello-consumer-key",
+	 "token": "the org-trello-access-token",
+	 "files": [
+	     "~/path/to/todo.org"
+	 ]
+     }
+   #+END_SRC
+
+   Once your creds are in lastpass, it's safe to delete
+   =~/.emacs.d/.trello/$TRELLO_USERNAME.el=.
+
+   Notice that for now we only support a single trello account per
+   lastpass account. Org-trello can support multiple trello accounts,
+   which is why its config files are namespaced by user.
+
+   I'd rather not have credentials on my filesystem, so there's a shim
+   below that inserts our credentials from lastpass where org-trello
+   would usually load them from disk. For now, this means limiting us
+   to one trello account per lastpass account.
+
+   #+BEGIN_SRC emacs-lisp
+     (use-package org-trello
+       :ensure t)
+
+     (defun gds-trello-setup ()
+       "Configure org-trello using creds from lastpass."
+       (interactive)
+       (gds-lastpass-ensure-logged-in-and-then
+	(lambda ()
+	  (let* ((creds-json (gds-lastpass-get-note "Personal/trello-creds"))
+		 (creds (json-read-from-string creds-json))
+		 (key (alist-get 'key creds))
+		 (token (alist-get 'token creds))
+		 (files (alist-get 'files creds)))
+	    (setq org-trello-files (map 'list #'identity files))
+
+	    ;; Shim our creds into all the interesting files, so org-trello
+	    ;; never tries to load the config file we deleted.
+	    (add-hook 'org-mode-hook
+		      (lambda ()
+			(message "gdsgds setting trello keys")
+			(setq org-trello-consumer-key key
+			      org-trello-access-token token)
+			(message "gdsgds trello keys set")))
+
+	    (defun gds-orgtrello-load-keys-shim (&rest args)
+	      "We already loaded keys from lastpass, so just return :ok"
+	      :ok)
+
+	    (advice-add 'orgtrello-controller-load-keys
+			:override
+			#'gds-orgtrello-load-keys-shim)
+
+	    (message "Trello Successfully Configured")))))
+   #+END_SRC
 
 ** Lastpass
 
