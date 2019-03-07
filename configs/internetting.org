@@ -355,24 +355,65 @@
 	    (funcall continuation))))
      #+END_SRC
 
-*** Open-in-gmail
-    Sometimes it's useful to be able to open the message you're
-    currently looking at in gmail. That way, you can create gmail
-    filters based on it, and that kind of thing.
+*** Gmail Integration
+
+    Everything else in [[*Email][this section]] will work with any IMAP/SMTP email
+    provider. However, there are two gmail-specific use-cases I find handy:
+
+    1. I'm reading email in gnus, and want to create a filter so that
+       this sort of email always arrives in a different inbox.
+    2. I [[file:basics.org::*Viewing%20and%20capturing%20tasks][capture a task]] while reading an email in gnus, and that task
+       gets [[*Trello][synced to trello]]. Later, I'm reading that task in trello,
+       and want to follow a link back to the email that inspired the
+       task.
+
+    Both of these use-cases need a way of getting a gmail URI from the
+    current email.
+
+    #+BEGIN_SRC emacs-lisp
+      (defun gds-gnus-get-gmail-link ()
+	"Get a gmail link for the current article.
+
+      Extract the message-id from the article header, then construct a
+      gmail URL to find it"
+	      (let* ((msg-header (gnus-summary-article-header))
+		     (msg-id (mail-header-id msg-header))
+		     (url-id (url-hexify-string (format "rfc822msgid:%s" msg-id))))
+		(format "https://mail.google.com/mail/u/0/?ibxr=0#search/%s" url-id)))
+    #+END_SRC
+
+**** Open in Gmail
+     Given a hyperlink to a given email in gmail, it's easy enough to
+     open that link in our default browser.
 
     #+BEGIN_SRC emacs-lisp
       (defun gds-gnus-open-in-gmail ()
-	"Open the current article in gmail.
-
-	Extract the message-id from the article header, then construct a
-      gmail URL to find it."
+	"Open the current article in gmail."
 	(interactive)
-	(let* ((msg-header (gnus-summary-article-header))
-	       (msg-id (mail-header-id msg-header))
-	       (url-id (url-hexify-string (format "rfc822msgid:%s" msg-id)))
-	       (message-url (format "https://mail.google.com/mail/u/0/?ibxr=0#search/%s" url-id)))
-	  (browse-url message-url)))
+	(browse-url (gds-gnus-get-gmail-link)))
+    #+END_SRC
 
+**** Gmail links in org-capture
+     Given a hyperlink to a given email in gmail, we can wrap
+     ~org-capture~ in a function which saves that link to a buffer,
+     [[file:basics.org::*Hyperlinks%20and%20Gmail%20Integration][which can then be used]] to construct a task that will make sense
+     even from the trello view.
+
+     #+BEGIN_SRC emacs-lisp
+       (defun gds-gnus-org-capture (&optional goto keys)
+	 "Wrap org-capture, and store a gmail link.
+
+       Call `org-capture', but first store a link to this email in
+       Gmail. This can be used later by `gds-org-pop-gmail-link' to
+       construct a task that's useful outside emacs."
+	 (interactive "P")
+	 (setq gds-org-gmail-link-buffer (gds-gnus-get-gmail-link))
+	 (org-capture goto keys))
+     #+END_SRC
+
+**** Adding keyboard shortcuts for it all
+
+     #+BEGIN_SRC emacs-lisp
       (define-minor-mode gds-gnus-summary-mode
 	"Toggle gds-gnus-summary-mode
 
@@ -381,10 +422,11 @@
       message in gmail will be bound to C-c g."
 	:keymap (let ((map (make-sparse-keymap)))
 		  (define-key map (kbd "C-c g") #'gds-gnus-open-in-gmail)
+		  (define-key map (kbd "C-c c") #'gds-gnus-org-capture)
 		  map))
 
       (add-hook 'gnus-summary-mode-hook #'gds-gnus-summary-mode)
-    #+END_SRC
+     #+END_SRC
 *** TODO Extract the auth-source shim business
     All that stuff is pretty ugly in-line, and would be testable as a
     library.

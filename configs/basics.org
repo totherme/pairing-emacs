@@ -397,49 +397,100 @@
 	       "* TODO %? \n  %a\n  %K"
 	       )
 	      ("1" "Todo by tomorrow" entry (file org-default-notes-file)
-	       "* TODO %? \n  :PROPERTIES:\n  :EXPIRY:   [%(gds-tomorrow)]\n  :END:\n  %a\n  %K"
+	       "* TODO %? \n  :PROPERTIES:\n  :EXPIRY:   [%(gds-tomorrow)]\n  :END:\n  %a%(gds-org-pop-gmail-link)\n  %K"
 	       )
 	      ("2" "Todo within a week" entry (file org-default-notes-file)
-	       "* TODO %? \n  :PROPERTIES:\n  :EXPIRY:   [%(gds-next-week)]\n  :END:\n  %a\n  %K"
+	       "* TODO %? \n  :PROPERTIES:\n  :EXPIRY:   [%(gds-next-week)]\n  :END:\n  %a%(gds-org-pop-gmail-link)\n  %K"
 	       )
 	      ("3" "Todo within a fortnight" entry (file org-default-notes-file)
-	       "* TODO %? \n  :PROPERTIES:\n  :EXPIRY:   [%(gds-in-a-fortnight)]\n  :END:\n  %a\n  %K"
+	       "* TODO %? \n  :PROPERTIES:\n  :EXPIRY:   [%(gds-in-a-fortnight)]\n  :END:\n  %a%(gds-org-pop-gmail-link)\n  %K"
 	       )
 	      ("4" "Todo within a month" entry (file org-default-notes-file)
-	       "* TODO %? \n  :PROPERTIES:\n  :EXPIRY:   [%(gds-next-month)]\n  :END:\n  %a\n  %K"
+	       "* TODO %? \n  :PROPERTIES:\n  :EXPIRY:   [%(gds-next-month)]\n  :END:\n  %a%(gds-org-pop-gmail-link)\n  %K"
 	       )
 	      ("5" "Todo within two months" entry (file org-default-notes-file)
-	       "* TODO %? \n  :PROPERTIES:\n  :EXPIRY:   [%(gds-in-two-months)]\n  :END:\n  %a\n  %K"
+	       "* TODO %? \n  :PROPERTIES:\n  :EXPIRY:   [%(gds-in-two-months)]\n  :END:\n  %a%(gds-org-pop-gmail-link)\n  %K"
 	       )))
-
-      (defun gds-today ()
-	"Get today's date as a string."
-	(format-time-string "%F" (current-time)))
-
-      (defun gds-tomorrow ()
-	"Get tomorrow's date as a string."
-	(format-time-string "%F" (time-add (current-time) (days-to-time 1))))
-
-      (defun gds-next-week ()
-	"Get next week's date as a string."
-	(format-time-string "%F" (time-add (current-time) (days-to-time 7))))
-
-      (defun gds-in-a-fortnight ()
-	"Get next fortnight's date as a string."
-	(format-time-string "%F" (time-add (current-time) (days-to-time 14))))
-
-      (defun gds-next-month ()
-	"Get next month's date as a string."
-	(cl-destructuring-bind (sec min hour day month year dow dst zone)
-	    (decode-time (current-time))
-	  (format-time-string "%F" (encode-time 0 0 0 day (+ 1 month) year))))
-
-      (defun gds-in-two-months ()
-	"Get two month's date as a string."
-	(cl-destructuring-bind (sec min hour day month year dow dst zone)
-	    (decode-time (current-time))
-	  (format-time-string "%F" (encode-time 0 0 0 day (+ 2 month) year))))
     #+END_SRC
+
+**** Hyperlinks and Gmail Integration
+     One helpful feature of these capture templates is the =%a=, which
+     means whenever we capture a task, it will include a hyperlink to
+     whatever we were doing before we hit =C-c c=. For example, if I'm
+     reading an email from a customer asking a difficult question, I
+     might hit =C-c c= and create a task to do the technical experiment
+     I need to do in order to answer that question. When I complete
+     that task sometime later, I can follow the link in the task to
+     find the email I want to reply to with my results.
+
+     This works great so long as I live entirely within emacs, but I'll
+     also often want to refer to my tasks from within trello. In those
+     situations, I need links to gmail rather than gnus. To make that
+     work, we'll need to join this org-capture config with [[file:internetting.org::*Email][our email
+     config]]. We'll create a variable ~gds-org-gmail-link-buffer~ to
+     communicate through. We'll configure gnus to fill that buffer with
+     a gmail link every time we call =org-capture=. At this end, we'll
+     pop any link out of the buffer and use it in our capture.
+    
+     #+BEGIN_SRC emacs-lisp
+       (defvar gds-org-gmail-link-buffer nil
+	 "A gmail link to a recently viewed email.
+
+       This is a one-place buffer, which might be nil, or might contain
+       a link to an email using Gmail. It should be set before calling
+       `org-capture', whereupon `gds-org-pop-gmail-link' will use it,
+       and set it back to nil.")
+
+       (defun gds-org-pop-gmail-link ()
+	 "Return either a link to a recent email, or \"\".
+
+       If there's a gmail link waiting in `gds-org-gmail-link-buffer',
+       then use it to construct a string for an org capture, set the
+       buffer to nil. If not, return the empty string."
+	 (let ((link gds-org-gmail-link-buffer))
+	   (if link
+	       (progn
+		 (setq gds-org-gmail-link-buffer nil)
+		 (format "\n  %s" link))
+	     "")))
+     #+END_SRC
+
+     
+**** Helper functions
+     Finally, we need a few little date utility functions, for when we
+     want to capture a task that only makes sense for the next day,
+     week, month, etc.
+
+     #+BEGIN_SRC emacs-lisp
+       (defun gds-today ()
+	 "Get today's date as a string."
+	 (format-time-string "%F" (current-time)))
+
+       (defun gds-tomorrow ()
+	 "Get tomorrow's date as a string."
+	 (format-time-string "%F" (time-add (current-time) (days-to-time 1))))
+
+       (defun gds-next-week ()
+	 "Get next week's date as a string."
+	 (format-time-string "%F" (time-add (current-time) (days-to-time 7))))
+
+       (defun gds-in-a-fortnight ()
+	 "Get next fortnight's date as a string."
+	 (format-time-string "%F" (time-add (current-time) (days-to-time 14))))
+
+       (defun gds-next-month ()
+	 "Get next month's date as a string."
+	 (cl-destructuring-bind (sec min hour day month year dow dst zone)
+	     (decode-time (current-time))
+	   (format-time-string "%F" (encode-time 0 0 0 day (+ 1 month) year))))
+
+       (defun gds-in-two-months ()
+	 "Get two month's date as a string."
+	 (cl-destructuring-bind (sec min hour day month year dow dst zone)
+	     (decode-time (current-time))
+	   (format-time-string "%F" (encode-time 0 0 0 day (+ 2 month) year))))
+     #+END_SRC
+
 * TODO Emacs Server
 
   I'd like to be able to start start the [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Emacs-Server.html][emacs server]] iff it's not
