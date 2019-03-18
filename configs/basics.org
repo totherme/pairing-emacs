@@ -387,8 +387,7 @@
 
     Because we're using org-trello, we need to capture all tasks as
     top-level items (trello doesn't support trees). I like to capture
-    tasks as regular =TODO= items, or as items that might expire if I
-    don't get to them in time.
+    tasks as regular =TODO= items, which may or may not have deadlines.
 
     #+BEGIN_SRC emacs-lisp
       (setq org-capture-templates
@@ -397,19 +396,19 @@
 	       "* TODO %? \n  %a\n  %K"
 	       )
 	      ("1" "Todo by tomorrow" entry (file org-default-notes-file)
-	       "* TODO %? \n  :PROPERTIES:\n  :EXPIRY:   [%(gds-tomorrow)]\n  :END:\n  %a%(gds-org-pop-gmail-link)\n  %K"
+	       "* TODO %? \n  :DEADLINE: <%(gds-tomorrow)>\n  :PROPERTIES:\n  :END:\n  %a%(gds-org-pop-gmail-link)\n  %K"
 	       )
 	      ("2" "Todo within a week" entry (file org-default-notes-file)
-	       "* TODO %? \n  :PROPERTIES:\n  :EXPIRY:   [%(gds-next-week)]\n  :END:\n  %a%(gds-org-pop-gmail-link)\n  %K"
+	       "* TODO %? \n  :DEADLINE: <%(gds-next-week)>\n  :PROPERTIES:\n  :END:\n  %a%(gds-org-pop-gmail-link)\n  %K"
 	       )
 	      ("3" "Todo within a fortnight" entry (file org-default-notes-file)
-	       "* TODO %? \n  :PROPERTIES:\n  :EXPIRY:   [%(gds-in-a-fortnight)]\n  :END:\n  %a%(gds-org-pop-gmail-link)\n  %K"
+	       "* TODO %? \n  :DEADLINE: <%(gds-in-a-fortnight)>\n  :PROPERTIES:\n  :END:\n  %a%(gds-org-pop-gmail-link)\n  %K"
 	       )
 	      ("4" "Todo within a month" entry (file org-default-notes-file)
-	       "* TODO %? \n  :PROPERTIES:\n  :EXPIRY:   [%(gds-next-month)]\n  :END:\n  %a%(gds-org-pop-gmail-link)\n  %K"
+	       "* TODO %? \n  :DEADLINE: <%(gds-next-month)>\n  :PROPERTIES:\n  :END:\n  %a%(gds-org-pop-gmail-link)\n  %K"
 	       )
 	      ("5" "Todo within two months" entry (file org-default-notes-file)
-	       "* TODO %? \n  :PROPERTIES:\n  :EXPIRY:   [%(gds-in-two-months)]\n  :END:\n  %a%(gds-org-pop-gmail-link)\n  %K"
+	       "* TODO %? \n  :DEADLINE: <%(gds-in-two-months)>\n  :PROPERTIES:\n  :END:\n  %a%(gds-org-pop-gmail-link)\n  %K"
 	       )))
     #+END_SRC
 

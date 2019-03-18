@@ -16,3 +16,4 @@ var
 /session.*
 request/
 /bookmarks
+/.#session*
