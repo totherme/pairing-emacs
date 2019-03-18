@@ -393,7 +393,7 @@
       (setq org-capture-templates
 	    '(
 	      ("t" "Todo" entry (file org-default-notes-file)
-	       "* TODO %? \n  %a\n  %K"
+	       "* TODO %? \n  %a%(gds-org-pop-gmail-link)\n  %K"
 	       )
 	      ("1" "Todo by tomorrow" entry (file org-default-notes-file)
 	       "* TODO %? \n  :DEADLINE: <%(gds-tomorrow)>\n  :PROPERTIES:\n  :END:\n  %a%(gds-org-pop-gmail-link)\n  %K"
