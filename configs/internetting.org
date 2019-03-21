@@ -528,7 +528,24 @@
 
 	    (message "Trello Successfully Configured")))))
    #+END_SRC
+*** Committing org-file trello items to git
+    I keep my main todo list in a single org-mode file, and sync it
+    with trello using the kit above. This means I often want to:
+    1. Sync to trello
+    2. Git commit the current file with message "todo"
+    3. Git push
 
+    Here's a thing for doing that.
+
+    #+BEGIN_SRC emacs-lisp
+      (defun gds-todo-commit ()
+	"Commit and push the current file with message \"todo\"."
+	(interactive)
+	(save-buffer)
+	(magit-stage-file (buffer-file-name))
+	(magit-commit (list "-m" "todo"))
+	(magit-push-current-to-pushremote nil))
+    #+END_SRC
 ** Lastpass
 
    Of course in order to do anything on the internet, we'll need
