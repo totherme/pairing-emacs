@@ -430,6 +430,24 @@
 *** TODO Extract the auth-source shim business
     All that stuff is pretty ugly in-line, and would be testable as a
     library.
+*** Composing email with org-mode
+    Sometimes email in plain text is way too boring. Fortunately,
+    org-mode documents can be exported into all the formats under the
+    sun, [[https://orgmode.org/worg/org-contrib/org-mime.html][including multipart mime]].
+
+    The following is the recommended config:
+    #+BEGIN_SRC emacs-lisp
+      (use-package org-mime
+	:ensure t)
+
+      (add-hook 'message-mode-hook
+		(lambda ()
+		  (local-set-key "\C-c\M-o" 'org-mime-htmlize)))
+
+      (add-hook 'org-mode-hook
+		(lambda ()
+		  (local-set-key "\C-c\M-o" 'org-mime-org-buffer-htmlize)))
+    #+END_SRC
 ** Trello
    I'd like to be able to use org-mode for tracking my todo lists
    while I'm on a laptop, but also be able to access them on my phone,
