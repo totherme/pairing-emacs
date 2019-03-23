@@ -531,20 +531,27 @@
 *** Committing org-file trello items to git
     I keep my main todo list in a single org-mode file, and sync it
     with trello using the kit above. This means I often want to:
-    1. Sync to trello
-    2. Git commit the current file with message "todo"
-    3. Git push
+    1. Sync my org file to trello
+    2. Save the resulting metadata to the org file
+    3. Git commit the org file with message "todo"
+    4. Git push
 
-    Here's a thing for doing that.
+    Here's a little thing for helping with that. For now my workflow
+    is =C-c o s= to sync to trello, followed by =C-c o p= to save,
+    commit, and push to git.
 
     #+BEGIN_SRC emacs-lisp
-      (defun gds-todo-commit ()
+      (defun gds-todo-commit-and-push ()
 	"Commit and push the current file with message \"todo\"."
 	(interactive)
 	(save-buffer)
 	(magit-stage-file (buffer-file-name))
 	(magit-commit (list "-m" "todo"))
 	(magit-push-current-to-pushremote nil))
+
+      (add-hook 'org-trello-mode-hook
+		(lambda ()
+		  (local-set-key (kbd "C-c o p") 'gds-todo-commit-and-push)))
     #+END_SRC
 ** Lastpass
 
