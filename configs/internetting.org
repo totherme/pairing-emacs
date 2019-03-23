@@ -226,7 +226,8 @@
 	   "smtp-address": "smtp.gmail.com or similar",
 	   "smtp-port": "587 or similar",
 	   "username": "my-username",
-	   "password": "my-password"
+	   "password": "my-password",
+	   "address-book-path": "~/my/address-book.ebdb"
        }
      #+END_SRC
 
@@ -255,6 +256,32 @@
      At some point, I might try to include an [[https://www.offlineimap.org/][offlineimap]] setup in
      here or something like that.
 
+*** Having an address book
+    There are millions of ways to do address books, and most of them
+    exist at least once in the emacs ecosystem. For now, I'm going to
+    try [[https://github.com/girzel/ebdb/blob/master/ebdb.org#ebdb-manual][EBDB]]. In case this doesn't work for you (or for future-me),
+    here are some other options:
+    - [[https://julien.danjou.info/google-contacts-for-emacs/][Google contacts.el]]
+    - [[https://www.reddit.com/r/emacs/comments/8toivy/tip_how_to_manage_your_contacts_with_orgcontacts/][Org Contacts]]
+    - [[https://github.com/DamienCassou/vdirel][vdirel]]
+    - Good old [[https://www.emacswiki.org/emacs/CategoryBbdb][BBDB]]
+
+    For now, I'm not going to worry about syncing with google
+    contacts. I'm just going to make EBDB save its state to somewhere in a git repo.
+
+    #+BEGIN_SRC emacs-lisp
+      (use-package ebdb
+	:ensure t)
+    #+END_SRC
+
+    I like to save the address of everyone who gets in touch with me.
+    
+    #+BEGIN_SRC emacs-lisp
+      (setq ebdb-mua-auto-update-p t)
+    #+END_SRC
+
+    We'll tell EBDB where to save its state in the [[*The actual configuration][configuration below]].
+    
 *** The actual configuration
      Most of the following configuration is borrowed straight from the
      [[https://www.emacswiki.org/emacs/GnusGmail][emacswiki page for making gmail work with gnus]]. The authinfo shim
@@ -290,7 +317,8 @@
 		   (smtp-address (alist-get 'smtp-address creds))
 		   (smtp-port (alist-get 'smtp-port creds))
 		   (username (alist-get 'username creds))
-		   (password (alist-get 'password creds)))
+		   (password (alist-get 'password creds))
+		   (address-book-path (alist-get 'address-book-path creds)))
 
 	      ;; First configure gnus with non-secrets
 	      (setq user-mail-address mail-address)
@@ -308,6 +336,11 @@
 
 	      (setq send-mail-function #'smtpmail-send-it)
 
+	      ;; Set the path to the ebdb address book
+	      (setq ebdb-sources address-book-path)
+	      (require 'ebdb-gnus)
+	      (require 'ebdb-message)
+	      
 	      ;; Now shim our secrets into the auth-source framework, so we
 	      ;; don't have to manually type in our app-specific password.
 	      (cl-defun gds-gnus-auth-source-search (&rest spec
@@ -427,9 +460,7 @@
 
       (add-hook 'gnus-summary-mode-hook #'gds-gnus-summary-mode)
      #+END_SRC
-*** TODO Extract the auth-source shim business
-    All that stuff is pretty ugly in-line, and would be testable as a
-    library.
+
 *** Composing email with org-mode
     Sometimes email in plain text is way too boring. Fortunately,
     org-mode documents can be exported into all the formats under the
@@ -448,6 +479,9 @@
 		(lambda ()
 		  (local-set-key "\C-c\M-o" 'org-mime-org-buffer-htmlize)))
     #+END_SRC
+*** TODO Extract the auth-source shim business
+    All that stuff is pretty ugly in-line, and would be testable as a
+    library.
 ** Trello
    I'd like to be able to use org-mode for tracking my todo lists
    while I'm on a laptop, but also be able to access them on my phone,
