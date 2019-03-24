@@ -8,6 +8,7 @@
   #+BEGIN_SRC emacs-lisp
     (use-package flycheck
 	:ensure t
+	:delight
 	:commands flycheck-mode)
   #+END_SRC
 
@@ -22,6 +23,7 @@
   #+BEGIN_SRC emacs-lisp
     (use-package company
       :ensure t
+      :delight
       :commands global-company-mode
       :init
       (add-hook 'after-init-hook 'global-company-mode)
@@ -38,6 +40,7 @@
   #+BEGIN_SRC emacs-lisp
     (use-package yasnippet
       :ensure t
+      :delight
       :init
       (add-hook 'after-init-hook 'yas-global-mode))  
   #+END_SRC
@@ -65,6 +68,7 @@
    #+BEGIN_SRC emacs-lisp
      (use-package paredit
        :ensure t
+       :delight
        :commands paredit-mode
        :init
        (add-hook 'emacs-lisp-mode-hook 'paredit-mode))
@@ -75,6 +79,7 @@
    #+BEGIN_SRC emacs-lisp
      (use-package rainbow-delimiters
        :ensure t
+       :delight
        :commands rainbow-delimiters-mode
        :init
        (add-hook 'emacs-lisp-mode-hook 'rainbow-delimiters-mode))
@@ -127,6 +132,7 @@
       (unless (getenv "GOPATH")
 	(use-package exec-path-from-shell
 	  :ensure t
+	  :delight
 	  :config
 	  (exec-path-from-shell-initialize)
 	  (exec-path-from-shell-copy-env "GOPATH")
@@ -192,10 +198,12 @@
     usual way.
     #+BEGIN_SRC emacs-lisp
       (use-package go-flymake
-	:load-path "~/.emacs.d/goflymake")
+	:load-path "~/.emacs.d/goflymake"
+	:delight)
       (add-hook 'go-mode-hook 'flymake-mode)
       (use-package go-eldoc
-	:ensure t)
+	:ensure t
+	:delight)
       (add-hook 'go-mode-hook 'go-eldoc-setup)
     #+END_SRC
 
@@ -203,7 +211,8 @@
     Use the company-go backend to provide smart (type-driven) autocompletion for go.
     #+BEGIN_SRC emacs-lisp
       (use-package company-go
-	:ensure t)
+	:ensure t
+	:delight)
     #+END_SRC
     In particular, note that this backend supports godocs. This means
     that if you're looking at a bunch of possible completions for your
@@ -226,7 +235,8 @@
     We can use [[https://github.com/nlamirault/gotest.el][gotest]] to run tests in a fine-grained way.
     #+BEGIN_SRC emacs-lisp
       (use-package gotest
-	:ensure t)
+	:ensure t
+	:delight)
     #+END_SRC
 
     The gotest home page suggests the following keybindings. I'm
@@ -279,7 +289,8 @@
 
    #+BEGIN_SRC emacs-lisp
      (use-package yard-mode
-       :ensure t)
+       :ensure t
+       :delight)
 
      (add-hook 'enh-ruby-mode-hook 'yard-mode)
    #+END_SRC
@@ -287,14 +298,16 @@
    Use [[https://github.com/bbatsov/rubocop][rubocop]] for on-the-fly linting.
    #+BEGIN_SRC emacs-lisp
      (use-package rubocop
-       :ensure t)
+       :ensure t
+       :delight)
      (add-hook 'enh-ruby-mode-hook 'rubocop-mode)
    #+END_SRC
 
    Use [[https://github.com/dgutov/robe][robe mode]] for IDE-like features.
    #+BEGIN_SRC emacs-lisp
      (use-package robe
-       :ensure t)
+       :ensure t
+       :delight)
 
      (add-hook 'enh-ruby-mode-hook 'robe-mode)
    #+END_SRC

@@ -469,7 +469,8 @@
     The following is the recommended config:
     #+BEGIN_SRC emacs-lisp
       (use-package org-mime
-	:ensure t)
+	:ensure t
+	:delight)
 
       (add-hook 'message-mode-hook
 		(lambda ()

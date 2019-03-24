@@ -43,7 +43,8 @@
    similar.
    #+BEGIN_SRC emacs-lisp
      (use-package projectile
-       :ensure t)
+       :ensure t
+       :delight)
      (projectile-mode)
    #+END_SRC
 
@@ -71,11 +72,11 @@
        (global-display-line-numbers-mode))
    #+END_SRC
 
-   We can use [[https://github.com/myrjola/diminish.el][diminish]] to clean up the mode-line, by reducing the
-   amount of space taken up by the names of all the minor-modes we
-   might be running.
+   We can use +[[https://github.com/myrjola/diminish.el][diminish]]+ [[https://www.emacswiki.org/emacs/DelightedModes][delight]] to clean up the mode-line, by
+   reducing the amount of space taken up by the names of all the
+   various modes we might be running.
    #+BEGIN_SRC emacs-lisp
-     (use-package diminish
+     (use-package delight
      :ensure t)
    #+END_SRC
 
@@ -109,6 +110,7 @@
     #+BEGIN_SRC emacs-lisp
       (use-package back-button
         :ensure t
+	:delight
         :commands back-button-mode)
       (back-button-mode 1)
       (define-key back-button-mode-map (kbd "C-x <left>") 'back-button-global-backward)
@@ -141,11 +143,14 @@
       #+BEGIN_SRC emacs-lisp
 	(use-package key-chord
 	  :ensure t
+	  :delight
 	  :config
 	  (use-package avy
-	    :ensure t)
+	    :ensure t
+	    :delight)
 	  (use-package ace-window
-	    :ensure t)
+	    :ensure t
+	    :delight)
 	  (key-chord-mode t)
 	  (key-chord-define-global "jj" 'avy-goto-word-1)
 	  (key-chord-define-global "jl" 'avy-goto-line)
@@ -158,6 +163,7 @@
    #+BEGIN_SRC emacs-lisp
        (use-package multiple-cursors
 	 :ensure t
+	 :delight
 	 :config
 	 (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
 	 (global-set-key (kbd "C->") 'mc/mark-next-like-this)
@@ -196,7 +202,8 @@
 
    #+BEGIN_SRC emacs-lisp
      (use-package undo-tree
-       :ensure t)
+       :ensure t
+       :delight)
      (global-undo-tree-mode)
        ;; https://www.emacswiki.org/emacs/UndoTree
    #+END_SRC
@@ -249,6 +256,7 @@
    #+BEGIN_SRC emacs-lisp
      (use-package neotree
        :ensure t
+       :delight
        :commands neotree-toggle
        :bind (("<f8>" . neotree-toggle)))
    #+END_SRC
