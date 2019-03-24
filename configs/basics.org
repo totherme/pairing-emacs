@@ -63,9 +63,12 @@
    Display line numbers -- this is especially useful when
    pair-programming.
    #+BEGIN_SRC emacs-lisp
-     (unless window-system
-       (setq linum-format "%3d \u2502 "))
-     (global-linum-mode)
+     (if (< emacs-major-version 26)
+	 (progn
+	   (unless window-system
+	     (setq linum-format "%3d \u2502 "))
+	   (global-linum-mode))
+       (global-display-line-numbers-mode))
    #+END_SRC
 
    We can use [[https://github.com/myrjola/diminish.el][diminish]] to clean up the mode-line, by reducing the
@@ -203,14 +206,15 @@
    add a bunch of advice around the undo-tree functions which force
    the line numbers to update themselves.
    #+BEGIN_SRC emacs-lisp
-     (defun undo-tree-visualizer-update-linum (&rest args)
-       (linum-update undo-tree-visualizer-parent-buffer))
-     (advice-add 'undo-tree-visualize-undo :after #'undo-tree-visualizer-update-linum)
-     (advice-add 'undo-tree-visualize-redo :after #'undo-tree-visualizer-update-linum)
-     (advice-add 'undo-tree-visualize-undo-to-x :after #'undo-tree-visualizer-update-linum)
-     (advice-add 'undo-tree-visualize-redo-to-x :after #'undo-tree-visualizer-update-linum)
-     (advice-add 'undo-tree-visualizer-mouse-set :after #'undo-tree-visualizer-update-linum)
-     (advice-add 'undo-tree-visualizer-set :after #'undo-tree-visualizer-update-linum)
+     (when (< emacs-major-version 26)
+       (defun undo-tree-visualizer-update-linum (&rest args)
+	 (linum-update undo-tree-visualizer-parent-buffer))
+       (advice-add 'undo-tree-visualize-undo :after #'undo-tree-visualizer-update-linum)
+       (advice-add 'undo-tree-visualize-redo :after #'undo-tree-visualizer-update-linum)
+       (advice-add 'undo-tree-visualize-undo-to-x :after #'undo-tree-visualizer-update-linum)
+       (advice-add 'undo-tree-visualize-redo-to-x :after #'undo-tree-visualizer-update-linum)
+       (advice-add 'undo-tree-visualizer-mouse-set :after #'undo-tree-visualizer-update-linum)
+       (advice-add 'undo-tree-visualizer-set :after #'undo-tree-visualizer-update-linum))
    #+END_SRC
 
    
