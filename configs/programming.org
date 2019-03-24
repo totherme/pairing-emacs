@@ -403,24 +403,24 @@
 
 *** Switching between them
     To switch from Dante to Intero and back, we provide
-    ~my-haskell-switch-to-intero~ and
-    ~my-haskell-switch-to-dante~. These will have no effect on any
+    ~gds-haskell-switch-to-intero~ and
+    ~gds-haskell-switch-to-dante~. These will have no effect on any
     currently open haskell buffers, but will allow you to switch the
     defaults for any buffers you open in future.
 
     So the workflow for editing a stack project is:
-    - ~M-x my-haskell-switch-to-intero~
+    - ~M-x gds-haskell-switch-to-intero~
     - ~C-x C-f ~/my-stack-project/main.hs~ (or similar)
 
     #+BEGIN_SRC emacs-lisp
-      (defun my-haskell-switch-to-intero ()
+      (defun gds-haskell-switch-to-intero ()
         "Use Intero instead of Dante for all future haskell editing."
         (interactive)
         (remove-hook 'haskell-mode-hook 'dante-mode)
         (remove-hook 'haskell-mode-hook 'flycheck-mode)
         (add-hook 'haskell-mode-hook 'intero-mode))
 
-      (defun my-haskell-switch-to-dante ()
+      (defun gds-haskell-switch-to-dante ()
         "Use Dante instead of Intero for all future haskell editing."
         (interactive)
         (remove-hook 'haskell-mode-hook 'intero-mode)

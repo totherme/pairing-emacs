@@ -89,12 +89,11 @@
    If we're in a window system, use the [[https://github.com/bbatsov/solarized-emacs][solarized theme]] to make emacs'
    colours a little prettier.
    #+BEGIN_SRC emacs-lisp
-     (if (display-graphic-p)
-	 (progn 
-	   (use-package solarized-theme
-	     :ensure t)
+     (when (display-graphic-p)
+	 (use-package solarized-theme
+	   :ensure t)
 
-	   (load-theme 'solarized-light t)))
+	 (load-theme 'solarized-light t))
    #+END_SRC
 
 ** Navigation
