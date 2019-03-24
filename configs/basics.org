@@ -317,6 +317,27 @@
      (put 'narrow-to-region 'disabled nil)
    #+END_SRC
 
+** Make the emacs help system prettier
+   The emacs help system is AWESOME, right out of the box. If you've
+   never played with it before, start with either =C-h C-h= (to get
+   help on help) or =C-h t= to start the emacs tutorial. You can look
+   up any package, any keybinding, any function, and any variable in
+   your emacs. You can find out what it does, where it was defined,
+   and so on.
+
+   The [[https://github.com/Wilfred/helpful][helpful]] package adds the icing to the cake. It syntax
+   highlights the help text, and adds a bunch of useful contextual
+   information and hyperlinks.
+
+   #+BEGIN_SRC emacs-lisp
+     (use-package helpful
+       :ensure t
+       :bind
+       ("C-h f" . helpful-callable)
+       ("C-h v" . helpful-variable)
+       ("C-h k" . helpful-key)
+       ("C-c C-d" . helpful-at-point))
+   #+END_SRC
 * Org-mode config
   
 ** Export to more formats
