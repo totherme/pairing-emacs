@@ -407,7 +407,9 @@
 
        Intended to be called through `ebdb-mua-auto-update-p'. Return
        nil if this email is from a noreply address, and t otherwise."
-  
+
+	 (gnus-article-show-summary)
+
 	 (let* ((msg-header (gnus-summary-article-header))
 		(from-line (mail-header-from msg-header)))
 	   (not (string-match-p (regexp-quote "noreply") from-line))))
@@ -415,6 +417,13 @@
        (setq ebdb-mua-auto-update-p #'gds-ebdb-check-gnus-addresses)
      #+END_SRC
 
+***** TODO Add an option to filter out a configurable list of regexes
+      :LOGBOOK:
+      - State "TODO"       from              [2019-06-05 Wed 16:11]
+      :END:
+      We could save the blacklist in a defcustom, and do a ~fold.map~
+      to test the lot.
+      
 *** Gmail Integration
 
     Everything else in [[*Email][this section]] will work with any IMAP/SMTP email
