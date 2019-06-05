@@ -388,6 +388,30 @@
 	    (funcall continuation))))
      #+END_SRC
 
+*** Some EBDB Configuration
+    First, let's disable the EBDB popup when it notices
+    addresses. That thing gets annoying fast on a small laptop screen.
+    #+BEGIN_SRC emacs-lisp
+      (setq ebdb-mua-pop-up nil)
+    #+END_SRC
+
+**** Ignore some email addresses
+
+     [[info:ebdb#Auto-Updating%20Records][This info page]] tells us how to customize how EBDB handles new
+     email addresses in things like gnus. I'll likely want to iterate
+     on this, but let's ignore everything with "noreply" in it to
+     start.
+
+     #+BEGIN_SRC emacs-lisp
+       (defun gds-ebdb-check-email-address (record address)
+	 "Check if ADDRESS is an email address we want to record in EBDB.
+
+       Returns either t or nil. Intended to be used in 'ebdb-add-mails'"
+	 (not (string-match-p (regexp-quote "noreply") address)))
+
+       (setq ebdb-add-mails #'gds-ebdb-check-email-address)
+     #+END_SRC
+
 *** Gmail Integration
 
     Everything else in [[*Email][this section]] will work with any IMAP/SMTP email
