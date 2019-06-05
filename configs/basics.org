@@ -232,7 +232,7 @@
 ** Handy Tools
    Start a shell with a single keypress.
    #+BEGIN_SRC emacs-lisp
-     (global-set-key (kbd "C-x M-m") 'shell)  
+     (global-set-key (kbd "C-x M-m") #'eshell)
    #+END_SRC
 
    Make dired (directory editing) behaviour more sensible:
