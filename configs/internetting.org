@@ -398,18 +398,21 @@
 **** Ignore some email addresses
 
      [[info:ebdb#Auto-Updating%20Records][This info page]] tells us how to customize how EBDB handles new
-     email addresses in things like gnus. I'll likely want to iterate
-     on this, but let's ignore everything with "noreply" in it to
-     start.
-
+     email addresses in things like gnus. To begin with, I'd like to
+     ignore any email address with "noreply" in it.
+     
      #+BEGIN_SRC emacs-lisp
-       (defun gds-ebdb-check-email-address (record address)
-	 "Check if ADDRESS is an email address we want to record in EBDB.
+       (defun gds-ebdb-check-gnus-addresses ()
+	 "Check the From field of the current gnus article for 'noreply' addresses.
 
-       Returns either t or nil. Intended to be used in 'ebdb-add-mails'"
-	 (not (string-match-p (regexp-quote "noreply") address)))
+       Intended to be called through `ebdb-mua-auto-update-p'. Return
+       nil if this email is from a noreply address, and t otherwise."
+  
+	 (let* ((msg-header (gnus-summary-article-header))
+		(from-line (mail-header-from msg-header)))
+	   (not (string-match-p (regexp-quote "noreply") from-line))))
 
-       (setq ebdb-add-mails #'gds-ebdb-check-email-address)
+       (setq ebdb-mua-auto-update-p #'gds-ebdb-check-gnus-addresses)
      #+END_SRC
 
 *** Gmail Integration
