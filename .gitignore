@@ -17,3 +17,5 @@ var
 request/
 /bookmarks
 /.#session*
+eshell/
+.trello
