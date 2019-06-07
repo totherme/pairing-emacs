@@ -408,11 +408,15 @@
        Intended to be called through `ebdb-mua-auto-update-p'. Return
        nil if this email is from a noreply address, and t otherwise."
 
-	 (gnus-article-show-summary)
+	 (save-excursion
+	   (unless (string= "Message" mode-name)
+	     (gnus-article-show-summary)
 
-	 (let* ((msg-header (gnus-summary-article-header))
-		(from-line (mail-header-from msg-header)))
-	   (not (string-match-p (regexp-quote "noreply") from-line))))
+	     (let* ((msg-header (gnus-summary-article-header))
+		    (from-line (mail-header-from msg-header)))
+	       (not (or
+		     (string-match-p (regexp-quote "ask@pivotal.io") from-line)
+		     (string-match-p (regexp-quote "noreply") from-line)))))))
 
        (setq ebdb-mua-auto-update-p #'gds-ebdb-check-gnus-addresses)
      #+END_SRC
