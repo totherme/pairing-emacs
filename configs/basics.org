@@ -522,6 +522,31 @@
 	   (format-time-string "%F" (encode-time 0 0 0 day (+ 2 month) year))))
      #+END_SRC
 
+* OS Helpers
+** Mac webcam or sound management
+   When I'm on a mac, sometimes my webcam or sound stop working. The
+   way to fix it is to kill some process, and allow the system to
+   restart it.
+
+   #+BEGIN_SRC emacs-lisp
+     (defun gds-fix-camera ()
+       "On a mac, restart the camera driver."
+       (interactive)
+       (shell "*fix-camera*")
+       (with-current-buffer "*fix-camera*"
+	 (insert "sudo pkill VDCAssistant")))
+
+     (defun gds-fix-sound ()
+       "On a mac, restart the sound driver."
+       (interactive)
+       (shell "*fix-sound*")
+       (with-current-buffer "*fix-sound*"
+	 (insert "sudo kill -9 `ps ax|grep 'coreaudio[a-z]' | awk '{print $1}'`")))
+   #+END_SRC
+*** TODO Make this a proper interactive thing that asks for the sudo password, then gets out of the way when it's done.
+    :LOGBOOK:
+    - State "TODO"       from              [2019-06-19 Wed 10:31]
+    :END:
 * TODO Emacs Server
 
   I'd like to be able to start start the [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Emacs-Server.html][emacs server]] iff it's not
