@@ -242,6 +242,10 @@
      introductions]] on the web, and once you have the rough idea, the
      [[https://www.gnus.org/manual.html][gnus manual]] is very good.
 
+     If you're using gmail, you can put your cursor over any mailbox
+     (including "All Mail") and hit =G G= to use gmail search on that
+     inbox.
+
 *** Trade-offs
      We're going to use IMAP to talk to gmail, because I want the view
      of my email on my phone to be synced with the view of my email on
@@ -307,6 +311,7 @@
 	 "Asynchronously configure gnus with creds from lastpass.
 
        Once we're done, call CONTINUATION."
+	 (require 'nnir)
 	 (gds-lastpass-ensure-logged-in-and-then
 	  (lambda ()
 	    (let* ((creds (json-read-from-string (gds-lastpass-get-note "Personal/email-creds")))
@@ -328,7 +333,11 @@
 		    (list 'nnimap email-provider-name
 			  (list 'nnimap-address imap-address)
 			  '(nnimap-server-port "imaps")
-			  '(nnimap-stream ssl)))
+			  '(nnimap-stream ssl)
+			  '(nnir-search-engine imap)))
+
+	      (add-to-list 'nnir-imap-search-arguments '("gmail" . "X-GM-RAW"))
+	      (setq nnir-imap-default-search-key "gmail")
 
 	      (setq smtpmail-smtp-server smtp-address
 		    smtpmail-smtp-service smtp-port
