@@ -340,7 +340,7 @@
 	      (setq ebdb-sources address-book-path)
 	      (require 'ebdb-gnus)
 	      (require 'ebdb-message)
-	      
+
 	      ;; Now shim our secrets into the auth-source framework, so we
 	      ;; don't have to manually type in our app-specific password.
 	      (cl-defun gds-gnus-auth-source-search (&rest spec
@@ -415,8 +415,9 @@
 	     (let* ((msg-header (gnus-summary-article-header))
 		    (from-line (mail-header-from msg-header)))
 	       (not (or
-		     (string-match-p (regexp-quote "ask@pivotal.io") from-line)
-		     (string-match-p (regexp-quote "noreply") from-line)))))))
+		     (string-match-p "ask[a-zA-Z-]*@pivotal.io" from-line)
+		     (string-match-p (regexp-quote "noreply") from-line)
+		     (string-match-p (regexp-quote "no-reply") from-line)))))))
 
        (setq ebdb-mua-auto-update-p #'gds-ebdb-check-gnus-addresses)
      #+END_SRC
