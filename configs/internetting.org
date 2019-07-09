@@ -426,7 +426,8 @@
 	       (not (or
 		     (string-match-p "ask[a-zA-Z-]*@pivotal.io" from-line)
 		     (string-match-p (regexp-quote "noreply") from-line)
-		     (string-match-p (regexp-quote "no-reply") from-line)))))))
+		     (string-match-p (regexp-quote "no-reply") from-line)
+		     (string-match-p (regexp-quote "do-not-reply") from-line)))))))
 
        (setq ebdb-mua-auto-update-p #'gds-ebdb-check-gnus-addresses)
      #+END_SRC
