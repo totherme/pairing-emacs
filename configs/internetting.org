@@ -198,7 +198,7 @@
    an email, then maybe check out:
    - the [[https://www.emacswiki.org/emacs/CategoryMail][Mail Category in the emacs wiki]] for emacs solutions
    - The following minimal mail clients that work with any text editor:
-     - [[http://www.mutt.org/][mutt]]
+     - [[http://www.mutt.org/][mutt]] (See [[*Alternative Email bits][Alternative Email bits]] below)
      - [[https://sup-heliotrope.github.io/][sup]]
      - [[https://notmuchmail.org/][notmuch]]
 
@@ -534,6 +534,41 @@
 *** TODO Extract the auth-source shim business
     All that stuff is pretty ugly in-line, and would be testable as a
     library.
+** Alternative Email bits
+   Sometimes it's nice to be able to use emacs with external MUAs,
+   such as [[mutt.org][mutt]]. To do this comfortably [[https://www.emacswiki.org/emacs/MuttInEmacs][we'll need]]:
+
+   Hooks to put mutt-emails in an email composition mode:
+   
+   #+begin_src emacs-lisp
+   (add-to-list 'auto-mode-alist '("/mutt" . mail-mode))
+   #+end_src
+   
+   This will work fine on its own, but on a US keyboard layout,
+   pressing ~C-c C-#~ to exit the editor is a pain in the left
+   hand. Far better to use the standard emacs "do what I mean" command
+   ~C-c C-c~:
+
+   #+begin_src emacs-lisp
+     (add-hook
+      'mail-mode-hook
+      (lambda ()
+	(define-key mail-mode-map (kbd "C-c C-c")
+	  (lambda ()
+	    "Save and exit the client"
+	    (interactive)
+	    (save-buffer)
+	    (server-edit)))))
+   #+end_src
+   
+   And, a mode for editing mutt config files:
+
+   #+begin_src emacs-lisp
+     (use-package mutt-mode
+       :ensure t
+       :commands (mutt-mode))
+   #+end_src
+
 ** Trello
    I'd like to be able to use org-mode for tracking my todo lists
    while I'm on a laptop, but also be able to access them on my phone,
