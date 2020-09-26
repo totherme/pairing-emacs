@@ -102,6 +102,20 @@
      (add-to-list 'default-frame-alist '(alpha . (85 . 70)))
    #+end_src
 
+   By default, we leave all the toolbars and menubars visible. But
+   sometimes it's nice to get rid of all that and make things quiet.
+
+   #+begin_src emacs-lisp
+     (defun gds-quiet-ui ()
+       "Make the GUI less noisy
+
+     Turn off the tool-bar, menu-bar, and scrollbars"
+       (interactive)
+       (tool-bar-mode 0)
+       (menu-bar-mode 0)
+       (scroll-bar-mode 0))
+   #+end_src
+
 ** Navigation
 
 *** Browser-like back/forward buttons
