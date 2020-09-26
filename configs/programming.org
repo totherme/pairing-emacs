@@ -44,6 +44,15 @@
       :init
       (add-hook 'after-init-hook 'yas-global-mode))  
   #+END_SRC
+
+** Git
+   #+begin_src emacs-lisp
+     (use-package git-gutter+
+       :ensure t
+       :commands git-gutter+-mode
+       :init
+       (add-hook 'after-init-hook 'global-git-gutter+-mode))
+   #+end_src
 ** Compilation
    Compilation buffers aren't coloured by default. This means ginkgo
    output is almost impossible to read. Let's try to fix that.
