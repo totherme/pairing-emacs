@@ -66,3 +66,13 @@
 	   (apply fn "duet-commit" (cdr args))
 	 (apply fn args)))
    #+END_SRC
+** Making magit work with GPG
+   If you sign your commits with GPG, you might want to be able to
+   enter GPG passphrases through emacs. This is possible with the
+   pinentry package.
+
+   #+begin_src emacs-lisp
+     (use-package pinentry
+       :ensure t)
+     (pinentry-start)
+   #+end_src
