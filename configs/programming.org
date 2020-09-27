@@ -50,6 +50,7 @@
      (use-package git-gutter+
        :ensure t
        :commands git-gutter+-mode
+       :delight
        :init
        (add-hook 'after-init-hook 'global-git-gutter+-mode))
    #+end_src
