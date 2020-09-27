@@ -47,12 +47,12 @@
 
 ** Git
    #+begin_src emacs-lisp
-     (use-package git-gutter+
+     (use-package git-gutter
        :ensure t
-       :commands git-gutter+-mode
+       :commands global-git-gutter-mode
        :delight
        :init
-       (add-hook 'after-init-hook 'global-git-gutter+-mode))
+       (add-hook 'after-init-hook 'global-git-gutter-mode))
    #+end_src
 ** Compilation
    Compilation buffers aren't coloured by default. This means ginkgo
