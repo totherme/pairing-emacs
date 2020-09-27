@@ -567,15 +567,41 @@
     :LOGBOOK:
     - State "TODO"       from              [2019-06-19 Wed 10:31]
     :END:
-* TODO Emacs Server
+* Emacs Server
 
-  I'd like to be able to start start the [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Emacs-Server.html][emacs server]] iff it's not
-  already running somewhere.  That way, folks who understand/like it
-  will be able to edit files at the commandline in our existing emacs,
-  using [[https://www.emacswiki.org/emacs/EmacsClient][emacsclient]], and folks who're new to emacs can ignore it, and
-  type =emacs= at their con as many times as they like without getting
-  weird error messages.
+  The [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Emacs-Server.html][emacs server]] and accompanying ~emacsclient~ allows us to edit
+  files at the commandline (for example, as a result of running ~git
+  commit~) in an existing instance of emacs. This has the advantages
+  of:
+  - Faster startup times for the client
+  - Access to common state in all instances of the editor, for
+    example, for use in autocomplete functions
 
+  The client only works if there is an instance of emacs running, in
+  which the command ~M-x server-start~ has been run. We could include
+  that command in these configs. Howvever, if we did that, then every
+  invocation of ~emacs~ after the first would suffer an error. This is
+  because it would attempt to start a second server listening on the
+  same port as the first.
+
+  Rather than invite errors of that kind, my preference is to use the
+  following wrapper scripts around ~emacsclient~.
+
+  In ~$HOME/bin/e~:
+  #+begin_src bash
+    #!/usr/bin/env bash
+    emacsclient -a "" -t "${@}"
+  #+end_src
+
+  In ~$HOME/bin/ec~:
+  #+begin_src bash
+    #!/usr/bin/env bash
+    emacsclient -a "" -c "${@}"
+  #+end_src
+
+  The ~e~ script starts a terminal-based client. The ~ec~ script
+  starts a client in a GUI window. We can therefore add ~$EDITOR="e"~
+  to our ~.bashrc~.
 
 * Footnotes
 
