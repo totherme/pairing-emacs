@@ -359,7 +359,18 @@
        ("C-c C-d" . helpful-at-point))
    #+END_SRC
 * Org-mode config
-  
+** Enable Structure Templates
+
+   Org-mode structure templates are handy for entering common org-mode
+   boilerplate. For example, for creating source code blocks, and so
+   on. You can read about them [[https://orgmode.org/manual/Structure-Templates.html#Structure-Templates][on the web]], or in your [[info:org#Structure Templates][local org info
+   page]].
+
+   I like to enable inline snippet expansion:
+   #+begin_src emacs-lisp
+     (require 'org-tempo)
+   #+end_src
+
 ** Export to more formats
    By default, org-mode will only export to ascii, html, icalendar, and
    latex. We can enable markdown, beamer and odt support.
