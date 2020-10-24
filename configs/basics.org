@@ -379,6 +379,17 @@
      (setq org-export-backends (list 'ascii 'html 'icalendar 'latex 'md 'beamer 'odt))
    #+END_SRC
 
+   For more formats, we need to install stuff. Here's one for
+   exporting to the format used by Atlassian Confluence -- which is a
+   wiki we use at work.
+
+   #+begin_src emacs-lisp
+     (use-package ox-confluence
+       :load-path "~/.emacs.d/from-the-net/")
+
+     (add-to-list 'org-export-backends 'confluence)
+   #+end_src
+
 ** Hyperlink to anything
    One of the helpful things in org-mode is its ability to [[https://orgmode.org/manual/Hyperlinks.html#Hyperlinks][hyperlink]]
    between lots of different types of things. I find it useful to have
