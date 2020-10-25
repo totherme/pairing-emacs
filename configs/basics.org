@@ -116,6 +116,22 @@
        (scroll-bar-mode 0))
    #+end_src
 
+   We can use [[https://github.com/gonewest818/dimmer.el][dimmer.el]] to make it more obvious which window/pane is
+   selected at a given time.
+
+   #+begin_src emacs-lisp
+     (use-package dimmer
+       :load-path "~/.emacs.d/from-the-net/dimmer.el/"
+       :delight
+       :config
+       (dimmer-configure-company-box)
+       (dimmer-configure-gnus)
+       (dimmer-configure-magit)
+       (dimmer-configure-org)
+       (setq dimmer-fraction 0.4)
+       (dimmer-mode t))
+   #+end_src
+
 ** Navigation
 
 *** Browser-like back/forward buttons

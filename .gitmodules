@@ -7,3 +7,6 @@
 [submodule "magit-toolbar"]
 	path = magit-toolbar
 	url = https://github.com/totherme/magit-toolbar
+[submodule "from-the-net/dimmer.el"]
+	path = from-the-net/dimmer.el
+	url = https://github.com/gonewest818/dimmer.el.git
