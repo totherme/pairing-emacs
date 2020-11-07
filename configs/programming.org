@@ -438,6 +438,101 @@
         (add-hook 'haskell-mode-hook 'flycheck-mode))
     #+END_SRC
 
+** Java
+   Pulling lots of stuff wholesale from [[https://github.com/neppramod/java_emacs/blob/master/emacs-configuration.org][Pramod Nepal's tutorial configs]].
+
+   Nepal says:
+   #+begin_quote
+   Treemacs provides UI elements used for LSP UI. Let’s install
+   lsp-treemacs and its dependency treemacs. We will also Assign M-9
+   to show error list.
+   #+end_quote
+
+   ...so let's get that:
+   #+begin_src emacs-lisp
+     (use-package lsp-treemacs
+       :after (lsp-mode treemacs)
+       :ensure t
+       :commands lsp-treemacs-errors-list
+       :bind (:map lsp-mode-map
+	      ("M-9" . lsp-treemacs-errors-list)))
+
+     (use-package treemacs
+       :ensure t
+       :commands (treemacs)
+       :after (lsp-mode))
+   #+end_src
+
+   #+begin_quote
+   LSP UI is used in various packages that require UI elements in
+   LSP. E.g lsp-ui-flycheck-list opens a windows where you can see
+   various coding errors while you code. You can use C-c l T to toggle
+   several UI elements. We have also remapped some of the xref-find
+   functions, so that we can easily jump around between symbols using
+   M-., M-,~ and ~M-? keys.
+   #+end_quote
+
+   #+begin_src emacs-lisp
+     (use-package lsp-ui
+     :ensure t
+     :after (lsp-mode)
+     :bind (:map lsp-ui-mode-map
+	      ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
+	      ([remap xref-find-references] . lsp-ui-peek-find-references))
+     :init (setq lsp-ui-doc-delay 1.5
+	   lsp-ui-doc-position 'bottom
+	       lsp-ui-doc-max-width 100
+     ))
+   #+end_src
+
+   #+begin_quote
+   Let’s install the main package for lsp. Here we will integrate lsp
+   with which-key. This way, when we type the prefix key C-c l we get
+   additional help for compliting the command.
+   #+end_quote
+
+   #+begin_src emacs-lisp
+     (use-package lsp-mode
+     :ensure t
+     :hook (
+	(lsp-mode . lsp-enable-which-key-integration)
+	(java-mode . #'lsp-deferred)
+     )
+     :init (setq 
+	 lsp-keymap-prefix "C-c l"              ; this is for which-key integration documentation, need to use lsp-mode-map
+	 lsp-enable-file-watchers nil
+	 read-process-output-max (* 1024 1024)  ; 1 mb
+	 lsp-completion-provider :capf
+	 lsp-idle-delay 0.500
+     )
+     :config 
+	 (setq lsp-intelephense-multi-root nil) ; don't scan unnecessary projects
+	 (with-eval-after-load 'lsp-intelephense
+	 (setf (lsp--client-multi-root (gethash 'iph lsp-clients)) nil))
+	     (define-key lsp-mode-map (kbd "C-c l") lsp-command-map)
+     )
+   #+end_src
+
+   #+begin_quote
+   You can start LSP server in a java project by using C-c l s s. Once
+   you type C-c l which-key package should guide you through rest of
+   the options. In above setting I have added some memory management
+   settings as suggested in this guide. Change them to higher numbers,
+   if you find lsp-mode sluggish in your computer.
+   #+end_quote
+
+   Now LSP-java
+
+   #+begin_quote
+   This is the package that handles server installation and session
+   management.
+   #+end_quote
+
+   #+begin_src emacs-lisp
+     (use-package lsp-java 
+     :ensure t
+     :config (add-hook 'java-mode-hook 'lsp))
+   #+end_src
 * Footnotes
 
 [fn:1] For example, if your stack project has different targets with
