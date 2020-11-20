@@ -388,24 +388,40 @@
    #+end_src
 
 ** Export to more formats
-   By default, org-mode will only export to ascii, html, icalendar, and
-   latex. We can enable markdown, beamer and odt support.
 
-   #+BEGIN_SRC emacs-lisp
-     (setq org-export-backends (list 'ascii 'html 'icalendar 'latex 'md 'beamer 'odt))
-   #+END_SRC
+*** Built in formats
+    By default, org-mode will only export to ascii, html, icalendar, and
+    latex. We can enable markdown, beamer and odt support.
 
-   For more formats, we need to install stuff. Here's one for
-   exporting to the format used by Atlassian Confluence -- which is a
-   wiki we use at work.
+    #+BEGIN_SRC emacs-lisp
+      (setq org-export-backends (list 'ascii 'html 'icalendar 'latex 'md 'beamer 'odt))
+    #+END_SRC
 
-   #+begin_src emacs-lisp
-     (use-package ox-confluence
-       :load-path "~/.emacs.d/from-the-net/")
+*** Additional Formats
+    For more formats, we need to install stuff.
+    
+**** Confluence
+     Here's one for exporting to the format used by Atlassian
+     Confluence -- which is a wiki we use at work.
 
-     (add-to-list 'org-export-backends 'confluence)
-   #+end_src
+     #+begin_src emacs-lisp
+       (use-package ox-confluence
+	 :load-path "~/.emacs.d/from-the-net/")
 
+       (add-to-list 'org-export-backends 'confluence)
+     #+end_src
+
+**** Clipboard
+     With ox-clip, we can export from org-mode as html-formatted text
+     in the clipboard. This one doesn't work from the usual export
+     dispatcher, so we bind it in org-mode to =C-c C-h=
+
+     #+begin_src emacs-lisp
+       (use-package ox-clip
+	 :ensure t)
+
+       (define-key org-mode-map (kbd "C-c C-h") 'ox-clip-formatted-copy)
+     #+end_src
 ** Hyperlink to anything
    One of the helpful things in org-mode is its ability to [[https://orgmode.org/manual/Hyperlinks.html#Hyperlinks][hyperlink]]
    between lots of different types of things. I find it useful to have
