@@ -596,6 +596,18 @@
 	   (format-time-string "%F" (encode-time 0 0 0 day (+ 2 month) year))))
      #+END_SRC
 
+** Execute more kinds of source blocks
+
+   By default, the only language that org-mode will run from org files
+   is =emacs-lisp=. Let's make it possible to run bash code from org too.
+
+   #+begin_src emacs-lisp
+     (org-babel-do-load-languages
+      'org-babel-load-languages
+      '((shell . t)))
+   #+end_src
+   
+
 * OS Helpers
 ** Mac webcam or sound management
    When I'm on a mac, sometimes my webcam or sound stop working. The
