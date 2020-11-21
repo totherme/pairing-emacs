@@ -60,6 +60,27 @@
    You can ask emacs for all the other project-related shortcuts by
    typing ~C-c p ?~.
 
+** Modern mode-line
+
+   Feebleline gets rid of the emacs modeline, and replaces it with a minimal thing in the echo area.
+   
+   #+begin_src emacs-lisp
+     (use-package    feebleline
+       :ensure       t
+       :config       (setq feebleline-msg-functions
+			   '((feebleline-line-number         :post "" :fmt "%5s")
+			     (feebleline-column-number       :pre ":" :fmt "%-2s")
+			     (feebleline-file-directory      :face feebleline-dir-face :post "")
+			     (feebleline-file-or-buffer-name :face font-lock-keyword-face :post "")
+			     (feebleline-file-modified-star  :face font-lock-warning-face :post "")
+			     (feebleline-git-branch          :face feebleline-git-face :pre " : ")
+			     (feebleline-project-name        :align right))))
+   #+end_src
+
+   I'm not going to turn it on by default, because I want all the GUI
+   elements to be available if this is someone's first time pairing in
+   emacs. However, =feebleline-mode= is used by =gds-quiet-ui= below.
+   
 ** Visual Stuff
    Display line numbers -- this is especially useful when
    pair-programming.
@@ -109,11 +130,12 @@
      (defun gds-quiet-ui ()
        "Make the GUI less noisy
 
-     Turn off the tool-bar, menu-bar, and scrollbars"
+     Turn off the tool-bar, menu-bar, scrollbars, and mode-line"
        (interactive)
        (tool-bar-mode 0)
        (menu-bar-mode 0)
-       (scroll-bar-mode 0))
+       (scroll-bar-mode 0)
+       (feebleline-mode 1))
    #+end_src
 
    We can use [[https://github.com/gonewest818/dimmer.el][dimmer.el]] to make it more obvious which window/pane is
