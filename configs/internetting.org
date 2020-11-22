@@ -188,7 +188,7 @@
     It's probably also worth checking out this [[http://endlessparentheses.com/keep-your-slack-distractions-under-control-with-emacs.html][keeping distractions
     under control]] blog before making decisions here.
 
-** Email
+** Email with Gnus
 
    If you don't know why you would want to read email in emacs then no
    worries -- it's a pretty weird thing to do.
@@ -534,7 +534,7 @@
 *** TODO Extract the auth-source shim business
     All that stuff is pretty ugly in-line, and would be testable as a
     library.
-** Alternative Email bits
+** Email with Mutt
    Sometimes it's nice to be able to use emacs with external MUAs,
    such as [[mutt.org][mutt]]. To do this comfortably [[https://www.emacswiki.org/emacs/MuttInEmacs][we'll need]]:
 
@@ -568,7 +568,81 @@
        :ensure t
        :commands (mutt-mode))
    #+end_src
+** Email with Mu4E
+*** Installing Mu and Mu4E
+    If we're on a system with =snap= (such as ubuntu), then we can use snap to install
+    =maildir-utils=:
 
+    #+begin_src bash :eval never
+      sudo snap install maildir-utils
+    #+end_src
+   
+    Then we can load =mu4e= from the snap:
+
+    #+begin_src emacs-lisp
+      (if (file-exists-p "/snap/maildir-utils/current/share/emacs/site-lisp/mu4e")
+	  (progn
+	    (add-to-list 'load-path "/snap/maildir-utils/current/share/emacs/site-lisp/mu4e")
+	    (require 'mu4e)))
+    #+end_src
+*** Installing the Mu4E info page
+
+    If we have the =maildir-utils= snap, then the info page we want is
+    in =/snap/maildir-utils/current/share/info=. To access this info
+    page, we need to add it to our info index. There are various
+    options and steps and [[info:texinfo#Other Info Directories][you can read about them in detail here]].
+    
+    For our case, we'll start by adding the snap info directory to our
+    list of info directories:
+
+    #+begin_src emacs-lisp
+      (add-to-list 'Info-directory-list "/snap/maildir-utils/current/share/info")
+    #+end_src
+
+    Now we should be able to follow org links like [[info:mu4e][this one]] to the
+    info file. However, we won't see Mu4e in the info directory if we
+    just hit =C-h i=. For that, we need a =dir= file that contains an
+    entry for Mu4e, and we need that dir file /also/ be in a path in
+    =Info-directory-list=.
+
+    Annoyingly, there's no =dir= file provided in the snap, so we'll
+    have to create one:
+
+    #+begin_src bash :eval never
+      install-info /snap/maildir-utils/current/share/info/mu4e.info ~/.emacs.d/info/dir
+    #+end_src
+
+    I've checked that dir file into this repo, so you don't have to
+    run the same command.
+
+    Now that we have a dir file that points to the right place, we can
+    add it to =Info-directory-list=:
+    #+begin_src emacs-lisp
+      (add-to-list 'Info-directory-list "~/.emacs.d/info")
+    #+end_src
+
+    Now we should have access to the Mu4e docs from within emacs. If
+    you want to access them from the CLI too, you'll need to add the
+    following lines to your =.bashrc= or similar:
+
+    #+begin_src bash :eval never
+      export INFOPATH="$INFOPATH:/snap/maildir-utils/current/share/info"
+      export INFOPATH="$INFOPATH:$HOME/.emacs.d/info"
+    #+end_src
+*** Actual configuration
+
+    Mu4e needs you to keep your email in a local maildir folder, so
+    I'm not going to try to build a generic config like I did for gnus
+    and lastpass above. Instead, let's load local email config from
+    another repo if it exists.
+
+    #+begin_src emacs-lisp
+      (if (file-exists-p "~/.mu4e-config.org")
+	  (org-babel-load-file "~/.mu4e-config.org"))
+    #+end_src
+
+    To figure out what to put in there, I refer you to the excellent
+    [[info:mu4e][mu4e info page]] that you should now have access to.
 ** Trello
    I'd like to be able to use org-mode for tracking my todo lists
    while I'm on a laptop, but also be able to access them on my phone,

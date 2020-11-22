@@ -396,6 +396,7 @@
        ("C-h k" . helpful-key)
        ("C-c C-d" . helpful-at-point))
    #+END_SRC
+
 * Org-mode config
 ** Enable Structure Templates
 
