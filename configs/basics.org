@@ -63,7 +63,7 @@
 ** Modern mode-line
 
    Feebleline gets rid of the emacs modeline, and replaces it with a minimal thing in the echo area.
-   
+
    #+begin_src emacs-lisp
      (use-package    feebleline
        :ensure       t
@@ -74,7 +74,8 @@
 			     (feebleline-file-or-buffer-name :face font-lock-keyword-face :post "")
 			     (feebleline-file-modified-star  :face font-lock-warning-face :post "")
 			     (feebleline-git-branch          :face feebleline-git-face :pre " : ")
-			     (feebleline-project-name        :align right))))
+			     (feebleline-project-name        :align right)
+			     (current-time-string	     :align right))))
    #+end_src
 
    I'm not going to turn it on by default, because I want all the GUI
