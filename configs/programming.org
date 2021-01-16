@@ -438,6 +438,19 @@
         (add-hook 'haskell-mode-hook 'flycheck-mode))
     #+END_SRC
 
+** LaTeX
+   #+begin_src emacs-lisp
+     (use-package latex-extra
+       :ensure t
+       :config
+       (add-hook 'LaTeX-mode-hook #'latex-extra-mode))
+
+     (use-package latex-preview-pane
+       :ensure t
+       :config
+       (latex-preview-pane-enable))
+   #+end_src
+
 * Footnotes
 
 [fn:1] For example, if your stack project has different targets with
