@@ -27,6 +27,15 @@
   
 * UI Tweaks And Keybindings
 
+** Basic Sanity
+   Don't put tabs everywhere. Use spaces instead. [[https://www.emacswiki.org/emacs/TabsAreEvil][Tabs are evil]].
+
+   #+begin_src emacs-lisp
+     (setq indent-tabs-mode nil)
+   #+end_src
+
+   If we need we can use =M-x untabify= or =M-x tabify= to change things up.
+   
 ** Behave more like an IDE, even in the terminal
    If we're in a terminal, we should allow terminal-mouse stuff.
    #+BEGIN_SRC emacs-lisp
