@@ -629,7 +629,40 @@
       export INFOPATH="$INFOPATH:/snap/maildir-utils/current/share/info"
       export INFOPATH="$INFOPATH:$HOME/.emacs.d/info"
     #+end_src
+*** Clean up executive emails
+    A lot of executive emails in outlook seem to be full of tables,
+    which get displayed in mu4e as really long space-padded
+    lines. This is annoying, and breaks up our paragraphs.
+
+    This function takes a read-only message window, and removes the
+    blank spaces at the end of each line.
+    #+begin_src emacs-lisp
+      (defun gds-clean-exec-email ()
+        (interactive)
+        (beginning-of-buffer)
+        (read-only-mode 0)
+        (replace-regexp " *$" "")
+        (read-only-mode 1)
+        (beginning-of-buffer))
+    #+end_src
 *** Actual configuration
+
+    When viewing html email, we can make =tab= and =backtab= keys
+    cycle through hyperlinks.
+    #+begin_src emacs-lisp
+      (add-hook 'mu4e-view-mode-hook
+        (lambda()
+          ;; try to emulate some of the eww key-bindings
+          (local-set-key (kbd "<tab>") 'shr-next-link)
+          (local-set-key (kbd "<backtab>") 'shr-previous-link)))
+    #+end_src
+
+    And I like to use a dark theme, so it's worth setting a max
+    luminosity for me.
+
+    #+begin_src emacs-lisp
+      (setq shr-color-visible-luminance-min 80)
+    #+end_src
 
     Mu4e needs you to keep your email in a local maildir folder, so
     I'm not going to try to build a generic config like I did for gnus
