@@ -528,6 +528,9 @@
     top-level items (trello doesn't support trees). I like to capture
     tasks as regular =TODO= items, which may or may not have deadlines.
 
+    If you don't plan to use [[file:internetting.org::*Trello][the org-trello stuff]], you'll want to set
+    =org-default-notes-file= to something sensible for you.
+
     #+BEGIN_SRC emacs-lisp
       (setq org-capture-templates
 	    '(
