@@ -10,8 +10,16 @@ not all remote pairs are comfortable with vim.
 
 This is an emacs and tmux configuration which is designed to:
 - be as accessible as possible to users of IDEs like
-  [goland](https://www.jetbrains.com/go/)
-- work properly in a terminal, so we can pair over ssh.
+  [goland](https://www.jetbrains.com/go/),
+- work properly in a terminal, so we can pair over ssh,
+- not leave sensitive info (copies of emails, ssh keys, etc) on your local disk.
+  - (so that you can use this config on a shared pairing station about as safely as you'd use webmail, etc)
+
+This is **not** what I'm currently using. I've found that these days:
+- I'm doing less pairing and more soloing, and
+- I'm working more on my own machine, where it's safe to store local copies of email and things
+
+...so I've switched to [a configuration that's more aimed at those needs](https://github.com/totherme/emacsd).
 
 # Table of Contents
 
